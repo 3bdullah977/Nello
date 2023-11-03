@@ -1,0 +1,20 @@
+{
+  "version": "5",
+  "dialect": "pg",
+  "entries": [
+    {
+      "idx": 0,
+      "version": "5",
+      "when": 1699035249294,
+      "tag": "0000_productive_redwing",
+      "breakpoints": true
+    },
+    {
+      "idx": 1,
+      "version": "5",
+      "when": 1699035568002,
+      "tag": "0001_silent_grim_reaper",
+      "breakpoints": true
+    }
+  ]
+}
