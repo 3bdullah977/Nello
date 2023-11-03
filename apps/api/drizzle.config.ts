@@ -3,7 +3,7 @@ import * as dotenv from 'dotenv'; // installed by @nestjs/config
 dotenv.config();
 
 export default {
-  strict: false,
+  strict: true,
   driver: 'pg',
   schema: './src/_schemas/*',
   dbCredentials: {
@@ -13,4 +13,6 @@ export default {
     port: parseInt(process.env.DB_PORT),
     database: process.env.DB_NAME,
   },
+  out: './drizzle',
+  verbose: true,
 } satisfies Config;

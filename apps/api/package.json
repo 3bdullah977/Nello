@@ -18,14 +18,18 @@
     "test:cov": "jest --coverage",
     "test:debug": "node --inspect-brk -r tsconfig-paths/register -r ts-node/register node_modules/.bin/jest --runInBand",
     "test:e2e": "jest --config ./test/jest-e2e.json",
-    "generate:pg": "drizzle-kit generate:pg --schema=./src/_schemas/*",
-    "introspect:pg": "drizzle-kit introspect:pg --schema=./src/_schemas/*"
+    "generate:db": "drizzle-kit generate:pg  --config=drizzle.config.ts",
+    "introspect:db": "drizzle-kit introspect:pg --config=drizzle.config.ts",
+    "push:db": "drizzle-kit push:pg  --config=drizzle.config.ts",
+    "drop:db": "drizzle-kit drop --config=drizzle.config.ts"
   },
   "dependencies": {
     "@nestjs/common": "^10.0.0",
     "@nestjs/config": "^3.1.1",
     "@nestjs/core": "^10.0.0",
+    "@nestjs/mapped-types": "*",
     "@nestjs/platform-express": "^10.0.0",
+    "@nestjs/platform-fastify": "^10.2.8",
     "dotenv": "^16.3.1",
     "drizzle-orm": "^0.28.6",
     "postgres": "^3.4.3",
@@ -33,6 +37,7 @@
     "rxjs": "^7.8.1"
   },
   "devDependencies": {
+    "@faker-js/faker": "^8.2.0",
     "@nestjs/cli": "^10.0.0",
     "@nestjs/schematics": "^10.0.0",
     "@nestjs/testing": "^10.0.0",
@@ -43,6 +48,7 @@
     "@typescript-eslint/eslint-plugin": "^6.0.0",
     "@typescript-eslint/parser": "^6.0.0",
     "drizzle-kit": "^0.19.13",
+    "esbuild-register": "^3.5.0",
     "eslint": "^8.42.0",
     "eslint-config-prettier": "^9.0.0",
     "eslint-plugin-prettier": "^5.0.0",
