@@ -2,7 +2,7 @@ import { FactoryProvider, Logger } from '@nestjs/common';
 import { ConfigType } from '@nestjs/config';
 import { PostgresJsDatabase, drizzle } from 'drizzle-orm/postgres-js';
 import { DBConfig } from '@/config';
-import postgres from 'postgres';
+import * as postgres from 'postgres';
 import { DefaultLogger, LogWriter } from 'drizzle-orm';
 
 export const DB = Symbol('DB_SERVICE');
