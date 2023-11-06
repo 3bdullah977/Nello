@@ -8,14 +8,9 @@ export function ok<T = any>(message: string, data: T, created = false) {
   };
 }
 
-export const res = (
-  message: string,
-  data: Record<'string', any>,
-  statusCode: HttpStatus,
-) => {
+export const res = (message: string, statusCode: HttpStatus) => {
   return {
     message,
     statusCode,
-    data,
   };
 };
