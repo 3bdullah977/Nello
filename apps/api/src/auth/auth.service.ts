@@ -20,7 +20,7 @@ export class AuthService {
     email,
     password,
   }: AuthLoginDto): Promise<LoginReturnType> {
-    const { data: user } = await this.usersService.findByEmail(email);
+    const user = await this.usersService.findByEmail(email);
     if (!user) throw new NotFoundException('Could not find user');
 
     const isPasswordValid = comparePasswords(user.password, password);
