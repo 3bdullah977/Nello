@@ -9,6 +9,7 @@ export const user = pgTable('user', {
   isAdmin: boolean('is_admin').notNull().default(false),
   email: text('email').notNull(),
   password: text('password').notNull(),
+  imageUrl: text('image_url'),
 });
 
 export const userRelations = relations(user, ({ many }) => ({
