@@ -3,6 +3,7 @@ import {
   Inject,
   Injectable,
   InternalServerErrorException,
+  UseGuards,
 } from '@nestjs/common';
 import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
@@ -10,6 +11,7 @@ import { DB, DBType } from '@/global/providers/db.provider';
 import { user } from '@/_schemas/user';
 import { eq } from 'drizzle-orm';
 import { hashPassword } from '@/utils/password';
+import LocalAuthGuard from '@/auth/guards/jwt.guard';
 
 @Injectable()
 export class UsersService {
@@ -31,6 +33,7 @@ export class UsersService {
     }
   }
 
+  @UseGuards(LocalAuthGuard)
   async findAll(page: number, limit: number) {
     try {
       const offset = (page - 1) * limit;
@@ -41,6 +44,7 @@ export class UsersService {
     }
   }
 
+  @UseGuards(LocalAuthGuard)
   async findByEmail(email: string) {
     try {
       const res = await this.db
@@ -53,6 +57,7 @@ export class UsersService {
     }
   }
 
+  @UseGuards(LocalAuthGuard)
   async findOne(id: number) {
     try {
       const res = await this.db.select().from(user).where(eq(user.id, id));
@@ -62,6 +67,7 @@ export class UsersService {
     }
   }
 
+  @UseGuards(LocalAuthGuard)
   async update(id: number, updateUserDto: UpdateUserDto) {
     try {
       const res = await this.db
@@ -75,6 +81,7 @@ export class UsersService {
     }
   }
 
+  @UseGuards(LocalAuthGuard)
   async remove(id: number) {
     try {
       const res = await this.db.delete(user).where(eq(user.id, id)).returning();

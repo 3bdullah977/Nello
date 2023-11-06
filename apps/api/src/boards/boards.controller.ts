@@ -9,6 +9,7 @@ import {
   Query,
   ParseIntPipe,
   HttpStatus,
+  UseGuards,
 } from '@nestjs/common';
 import { BoardsService } from './boards.service';
 import { CreateBoardDto } from './dto/create-board.dto';
@@ -17,8 +18,10 @@ import { ApiTags } from '@nestjs/swagger';
 import { QueryBoardDto } from './dto/query-board.dto';
 import { Board } from '@/_schemas/board';
 import { ok, res } from '@/utils/reponse-helper';
+import LocalAuthGuard from '@/auth/guards/jwt.guard';
 
 @ApiTags('Boards')
+@UseGuards(LocalAuthGuard)
 @Controller({ path: 'boards', version: '1' })
 export class BoardsController {
   constructor(private readonly boardsService: BoardsService) {}
