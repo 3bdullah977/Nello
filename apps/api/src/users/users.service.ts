@@ -1,26 +1,87 @@
-import { Injectable } from '@nestjs/common';
+import {
+  BadRequestException,
+  Inject,
+  Injectable,
+  InternalServerErrorException,
+} from '@nestjs/common';
 import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
+import { DB, DBType } from '@/global/providers/db.provider';
+import { user } from '@/_schemas/user';
+import { eq } from 'drizzle-orm';
+import { hashPassword } from '@/utils/password';
 
 @Injectable()
 export class UsersService {
-  create(createUserDto: CreateUserDto) {
-    return 'This action adds a new user';
+  constructor(@Inject(DB) private readonly db: DBType) {}
+
+  async create(createUserDto: CreateUserDto) {
+    try {
+      const isInDB = await this.findByEmail(createUserDto.email);
+      if (isInDB) throw new BadRequestException('User already exists');
+
+      const hashed = hashPassword(createUserDto.password);
+      const res = await this.db
+        .insert(user)
+        .values({ ...createUserDto, password: hashed })
+        .returning();
+      return res[0];
+    } catch (error) {
+      throw new InternalServerErrorException(`Cannot create user. ${error}`);
+    }
   }
 
-  findAll() {
-    return `This action returns all users`;
+  async findAll(page: number, limit: number) {
+    try {
+      const offset = (page - 1) * limit;
+      const res = await this.db.select().from(user).limit(limit).offset(offset);
+      return res;
+    } catch (error) {
+      throw new InternalServerErrorException(`Cannot find users. ${error}`);
+    }
   }
 
-  findOne(id: number) {
-    return `This action returns a #${id} user`;
+  async findByEmail(email: string) {
+    try {
+      const res = await this.db
+        .select()
+        .from(user)
+        .where(eq(user.email, email));
+      return res[0];
+    } catch (error) {
+      throw new InternalServerErrorException(`Cannot retrieve user. ${error}`);
+    }
   }
 
-  update(id: number, updateUserDto: UpdateUserDto) {
-    return `This action updates a #${id} user`;
+  async findOne(id: number) {
+    try {
+      const res = await this.db.select().from(user).where(eq(user.id, id));
+      return res[0];
+    } catch (error) {
+      throw new InternalServerErrorException(`Cannot retrieve user. ${error}`);
+    }
   }
 
-  remove(id: number) {
-    return `This action removes a #${id} user`;
+  async update(id: number, updateUserDto: UpdateUserDto) {
+    try {
+      const res = await this.db
+        .update(user)
+        .set(updateUserDto)
+        .where(eq(user.id, id))
+        .returning();
+      return res[0];
+    } catch (error) {
+      throw new InternalServerErrorException(`Cannot update user. ${error}`);
+    }
+  }
+
+  async remove(id: number) {
+    try {
+      const res = await this.db.delete(user).where(eq(user.id, id)).returning();
+
+      return res[0];
+    } catch (error) {
+      throw new InternalServerErrorException(`Cannot remove user. ${error}`);
+    }
   }
 }

@@ -9,3 +9,8 @@ export const DBConfig = registerAs('db', () => ({
   port: process.env.DB_PORT,
   database: process.env.DB_NAME,
 }));
+
+export const JWTConfig = registerAs('jwt', () => ({
+  secretKey: process.env.JWT_SECRET,
+  expiresIn: process.env.JWT_EXPIRES_IN,
+}));
