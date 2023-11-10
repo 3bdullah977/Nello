@@ -9,13 +9,17 @@ import {
   ParseIntPipe,
   Query,
   HttpStatus,
+  HttpCode,
+  UseGuards,
+  Req,
 } from '@nestjs/common';
 import { UsersService } from './users.service';
 import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
-import { ApiTags } from '@nestjs/swagger';
+import { ApiBearerAuth, ApiTags } from '@nestjs/swagger';
 import { QueryUserDto } from './dto/query-user.dto';
 import { ok, res } from '@/utils/reponse-helper';
+import { AuthGuard } from '@nestjs/passport';
 
 @ApiTags('Users')
 @Controller({
@@ -23,18 +27,23 @@ import { ok, res } from '@/utils/reponse-helper';
   version: '1',
 })
 export class UsersController {
-  constructor(private readonly usersService: UsersService) {}
+  constructor(private readonly usersService: UsersService) { }
 
   @Post()
+  @HttpCode(201)
   async create(@Body() createUserDto: CreateUserDto) {
     return ok(
       'Created user successfully',
       await this.usersService.create(createUserDto),
+      true
     );
   }
 
   @Get()
-  async findAll(@Query() query: QueryUserDto) {
+  @ApiBearerAuth()
+  @UseGuards(AuthGuard('jwt'))
+  async findAll(@Req() req, @Query() query: QueryUserDto) {
+    console.log(req)
     const page = query?.page ?? 1;
     let limit = query?.limit ?? 10;
     if (limit > 50) {

@@ -15,7 +15,7 @@ import LocalAuthGuard from '@/auth/guards/jwt.guard';
 
 @Injectable()
 export class UsersService {
-  constructor(@Inject(DB) private readonly db: DBType) {}
+  constructor(@Inject(DB) private readonly db: DBType) { }
 
   async create(createUserDto: CreateUserDto) {
     try {
@@ -33,7 +33,6 @@ export class UsersService {
     }
   }
 
-  @UseGuards(LocalAuthGuard)
   async findAll(page: number, limit: number) {
     try {
       const offset = (page - 1) * limit;
@@ -44,7 +43,6 @@ export class UsersService {
     }
   }
 
-  @UseGuards(LocalAuthGuard)
   async findByEmail(email: string) {
     try {
       const res = await this.db
@@ -57,7 +55,6 @@ export class UsersService {
     }
   }
 
-  @UseGuards(LocalAuthGuard)
   async findOne(id: number) {
     try {
       const res = await this.db.select().from(user).where(eq(user.id, id));
@@ -67,7 +64,6 @@ export class UsersService {
     }
   }
 
-  @UseGuards(LocalAuthGuard)
   async update(id: number, updateUserDto: UpdateUserDto) {
     try {
       const res = await this.db
@@ -81,7 +77,6 @@ export class UsersService {
     }
   }
 
-  @UseGuards(LocalAuthGuard)
   async remove(id: number) {
     try {
       const res = await this.db.delete(user).where(eq(user.id, id)).returning();
