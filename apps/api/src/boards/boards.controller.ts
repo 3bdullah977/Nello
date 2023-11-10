@@ -10,27 +10,30 @@ import {
   ParseIntPipe,
   HttpStatus,
   UseGuards,
+  HttpCode,
 } from '@nestjs/common';
 import { BoardsService } from './boards.service';
 import { CreateBoardDto } from './dto/create-board.dto';
 import { UpdateBoardDto } from './dto/update-board.dto';
-import { ApiTags } from '@nestjs/swagger';
+import { ApiBearerAuth, ApiTags } from '@nestjs/swagger';
 import { QueryBoardDto } from './dto/query-board.dto';
 import { Board } from '@/_schemas/board';
 import { ok, res } from '@/utils/reponse-helper';
 import LocalAuthGuard from '@/auth/guards/jwt.guard';
 
 @ApiTags('Boards')
+@ApiBearerAuth()
 @UseGuards(LocalAuthGuard)
 @Controller({ path: 'boards', version: '1' })
 export class BoardsController {
-  constructor(private readonly boardsService: BoardsService) {}
+  constructor(private readonly boardsService: BoardsService) { }
 
   @Post()
+  @HttpCode(201)
   async create(@Body() createBoardDto: CreateBoardDto) {
     if (!createBoardDto) return null;
     const board = await this.boardsService.create(createBoardDto);
-    return ok<Board>('Created board successfully', board);
+    return ok<Board>('Created board successfully', board, true);
   }
 
   @Get()
