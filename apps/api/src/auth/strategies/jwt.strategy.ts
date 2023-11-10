@@ -16,12 +16,10 @@ export default class LocalStrategy extends PassportStrategy(Strategy, 'jwt') {
     });
   }
 
-  async validate(email: string, password: string) {
-    console.log('validate');
-    const user = await this.authService.validateLogin({ email, password });
-    if (!user) {
+  async validate(payload: any) {
+    if (!payload) {
       throw new UnauthorizedException();
     }
-    return user;
+    return payload;
   }
 }
