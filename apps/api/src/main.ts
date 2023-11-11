@@ -6,6 +6,9 @@ import {
 } from '@nestjs/platform-fastify';
 import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
 import { ValidationPipe } from '@nestjs/common';
+import fastifyHelmet from '@fastify/helmet';
+import { contentParser } from 'fastify-multer';
+import { join } from 'path';
 
 async function bootstrap() {
   const app = await NestFactory.create<NestFastifyApplication>(
@@ -23,7 +26,21 @@ async function bootstrap() {
   app.setGlobalPrefix('/api/v1', { exclude: ['/'] });
   app.useGlobalPipes(new ValidationPipe({ whitelist: true }));
   const document = SwaggerModule.createDocument(app, config);
+
+  app.useStaticAssets({ root: join(__dirname, '../../api/uploads') });
+
   SwaggerModule.setup('/documentation', app, document);
+  app.register(fastifyHelmet, {
+    contentSecurityPolicy: {
+      directives: {
+        defaultSrc: [`'self'`],
+        styleSrc: [`'self'`, `'unsafe-inline'`],
+        imgSrc: [`'self'`, 'data:', 'validator.swagger.io'],
+        scriptSrc: [`'self'`, `https: 'unsafe-inline'`],
+      },
+    },
+  });
+  app.register(contentParser);
   await app.listen(3001, '0.0.0.0');
 }
 bootstrap();
