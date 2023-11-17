@@ -1,9 +1,10 @@
 import { BadRequestException, Injectable } from '@nestjs/common';
-import { v2 as cloundinary } from 'cloudinary';
+import { cloudinary } from './cloudinary';
 
 @Injectable()
 export class CloudinaryService {
   async uploadImage(file: Express.Multer.File): Promise<object> {
+    console.log(cloudinary.config.call(this));
     if (file.size > 10000000) throw new BadRequestException('Image size limit');
 
     if (!file.mimetype.startsWith('image'))
@@ -11,7 +12,7 @@ export class CloudinaryService {
 
     const content = file.buffer;
     return new Promise((resolve, _reject) => {
-      cloundinary.uploader
+      cloudinary.uploader
         .upload_stream(
           {
             folder: 'boards_cover',

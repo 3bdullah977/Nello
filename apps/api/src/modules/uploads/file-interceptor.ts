@@ -25,7 +25,6 @@ export function FileInterceptor(
       options: Multer,
     ) {
       this.multer = (FastifyMulter as any)({ ...options, ...localOptions });
-      console.log(options);
     }
 
     async intercept(

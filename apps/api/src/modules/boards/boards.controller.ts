@@ -26,7 +26,6 @@ import LocalAuthGuard from '@/modules/auth/guards/jwt.guard';
 import { FileInterceptor } from '../uploads/file-interceptor';
 import { imageFileFilter } from '@/utils/file-upload-util';
 import { CloudinaryService } from '../cloudinary/cloudinary.service';
-import SingleFileDto from '../uploads/dto/single-file.dto';
 import CoverPhotoDto from '../uploads/dto/coverPhoto.dto';
 
 @ApiTags('Boards')
@@ -98,7 +97,6 @@ export class BoardsController {
     @UploadedFile() file: Express.Multer.File,
     @Body() _input: CoverPhotoDto,
   ) {
-    console.log(file);
     const uploadedCover = await this.cloudinaryService.uploadImage(file);
     return ok('Cover uploaded successfully', {
       photoUrl: (uploadedCover as any).url,
