@@ -3,19 +3,17 @@ import {
   Inject,
   Injectable,
   InternalServerErrorException,
-  UseGuards,
 } from '@nestjs/common';
 import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
-import { DB, DBType } from '@/global/providers/db.provider';
-import { user } from '@/_schemas/user';
+import { DB, DBType } from '@/modules/global/providers/db.provider';
+import { user } from '@/modules/_schemas/user';
 import { eq } from 'drizzle-orm';
 import { hashPassword } from '@/utils/password';
-import LocalAuthGuard from '@/auth/guards/jwt.guard';
 
 @Injectable()
 export class UsersService {
-  constructor(@Inject(DB) private readonly db: DBType) { }
+  constructor(@Inject(DB) private readonly db: DBType) {}
 
   async create(createUserDto: CreateUserDto) {
     try {

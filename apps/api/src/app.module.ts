@@ -3,14 +3,15 @@ import { AppController } from './app.controller';
 import { AppService } from './app.service';
 import { ConfigModule } from '@nestjs/config';
 import { DBConfig, JWTConfig } from './config';
-import { GlobalModule } from './global/global.module';
-import { CommentsModule } from './comments/comments.module';
-import { CardsModule } from './cards/cards.module';
-import { ColumnsModule } from './columns/columns.module';
-import { BoardsModule } from './boards/boards.module';
-import { UsersModule } from './users/users.module';
-import { AuthModule } from './auth/auth.module';
-import { UploadsModule } from './uploads/uploads.module';
+import { GlobalModule } from './modules/global/global.module';
+import { CommentsModule } from './modules/comments/comments.module';
+import { CardsModule } from './modules/cards/cards.module';
+import { ColumnsModule } from './modules/columns/columns.module';
+import { BoardsModule } from './modules/boards/boards.module';
+import { UsersModule } from './modules/users/users.module';
+import { AuthModule } from './modules/auth/auth.module';
+import { UploadsModule } from './modules/uploads/uploads.module';
+import { CloudinaryModule } from './modules/cloudinary/cloudinary.module';
 
 @Module({
   imports: [
@@ -26,6 +27,7 @@ import { UploadsModule } from './uploads/uploads.module';
     CommentsModule,
     AuthModule,
     UploadsModule,
+    CloudinaryModule,
   ],
   controllers: [AppController],
   providers: [AppService],

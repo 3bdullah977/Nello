@@ -5,8 +5,8 @@ import {
 } from '@nestjs/common';
 import { CreateBoardDto } from './dto/create-board.dto';
 import { UpdateBoardDto } from './dto/update-board.dto';
-import { DB, DBType } from '@/global/providers/db.provider';
-import { board } from '@/_schemas/board';
+import { DB, DBType } from '@/modules/global/providers/db.provider';
+import { board } from '@/modules/_schemas/board';
 import { eq } from 'drizzle-orm';
 
 @Injectable()
