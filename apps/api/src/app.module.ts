@@ -2,7 +2,7 @@ import { Module } from '@nestjs/common';
 import { AppController } from './app.controller';
 import { AppService } from './app.service';
 import { ConfigModule } from '@nestjs/config';
-import { DBConfig, JWTConfig } from './config';
+import { CloudinaryConfig, DBConfig, JWTConfig } from './config';
 import { GlobalModule } from './modules/global/global.module';
 import { CommentsModule } from './modules/comments/comments.module';
 import { CardsModule } from './modules/cards/cards.module';
@@ -17,7 +17,7 @@ import { CloudinaryModule } from './modules/cloudinary/cloudinary.module';
   imports: [
     ConfigModule.forRoot({
       isGlobal: true,
-      load: [DBConfig, JWTConfig],
+      load: [DBConfig, JWTConfig, CloudinaryConfig],
     }),
     GlobalModule,
     UsersModule,

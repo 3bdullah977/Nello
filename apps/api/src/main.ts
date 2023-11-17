@@ -29,7 +29,6 @@ async function bootstrap() {
 
   app.useStaticAssets({ root: join(__dirname, '../../api/uploads') });
 
-  SwaggerModule.setup('/documentation', app, document);
   app.register(fastifyHelmet, {
     contentSecurityPolicy: {
       directives: {
@@ -41,6 +40,7 @@ async function bootstrap() {
     },
   });
   app.register(contentParser);
+  SwaggerModule.setup('/documentation', app, document);
   await app.listen(3001, '0.0.0.0');
 }
 bootstrap();

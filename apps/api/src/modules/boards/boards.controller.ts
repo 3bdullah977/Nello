@@ -11,22 +11,33 @@ import {
   HttpStatus,
   UseGuards,
   HttpCode,
+  UseInterceptors,
+  UploadedFile,
+  Req,
 } from '@nestjs/common';
 import { BoardsService } from './boards.service';
 import { CreateBoardDto } from './dto/create-board.dto';
 import { UpdateBoardDto } from './dto/update-board.dto';
-import { ApiBearerAuth, ApiTags } from '@nestjs/swagger';
+import { ApiBearerAuth, ApiConsumes, ApiTags } from '@nestjs/swagger';
 import { QueryBoardDto } from './dto/query-board.dto';
 import { Board } from '@/modules/_schemas/board';
 import { ok, res } from '@/utils/reponse-helper';
 import LocalAuthGuard from '@/modules/auth/guards/jwt.guard';
+import { FileInterceptor } from '../uploads/file-interceptor';
+import { imageFileFilter } from '@/utils/file-upload-util';
+import { CloudinaryService } from '../cloudinary/cloudinary.service';
+import SingleFileDto from '../uploads/dto/single-file.dto';
+import CoverPhotoDto from '../uploads/dto/coverPhoto.dto';
 
 @ApiTags('Boards')
 @ApiBearerAuth()
 @UseGuards(LocalAuthGuard)
 @Controller({ path: 'boards', version: '1' })
 export class BoardsController {
-  constructor(private readonly boardsService: BoardsService) {}
+  constructor(
+    private readonly boardsService: BoardsService,
+    private readonly cloudinaryService: CloudinaryService,
+  ) {}
 
   @Post()
   @HttpCode(201)
@@ -75,5 +86,22 @@ export class BoardsController {
     if (!board) return res('No board with this id', HttpStatus.NOT_FOUND);
 
     return ok<Board>('Removed board successfully', board);
+  }
+
+  @ApiConsumes('multipart/form-data')
+  @Post('/uploadCover')
+  @UseInterceptors(
+    FileInterceptor('boardCover', { fileFilter: imageFileFilter }),
+  )
+  async uploadCover(
+    @Req() req: Request,
+    @UploadedFile() file: Express.Multer.File,
+    @Body() _input: CoverPhotoDto,
+  ) {
+    console.log(file);
+    const uploadedCover = await this.cloudinaryService.uploadImage(file);
+    return ok('Cover uploaded successfully', {
+      photoUrl: (uploadedCover as any).url,
+    });
   }
 }

@@ -9,7 +9,7 @@ import {
 } from '@nestjs/common';
 import { Multer, Options } from 'multer';
 import FastifyMulter from 'fastify-multer';
-import { Observable } from 'rxjs';
+import { Observable, map } from 'rxjs';
 
 type MulterInstance = any;
 export function FileInterceptor(
@@ -25,6 +25,7 @@ export function FileInterceptor(
       options: Multer,
     ) {
       this.multer = (FastifyMulter as any)({ ...options, ...localOptions });
+      console.log(options);
     }
 
     async intercept(
@@ -45,7 +46,7 @@ export function FileInterceptor(
           },
         );
       });
-      return next.handle();
+      return next.handle().pipe(map((data) => ({ data })));
     }
   }
 

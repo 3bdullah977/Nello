@@ -1,4 +1,5 @@
 import {
+  BadRequestException,
   Inject,
   Injectable,
   InternalServerErrorException,
@@ -8,10 +9,14 @@ import { UpdateBoardDto } from './dto/update-board.dto';
 import { DB, DBType } from '@/modules/global/providers/db.provider';
 import { board } from '@/modules/_schemas/board';
 import { eq } from 'drizzle-orm';
+import { CloudinaryService } from '../cloudinary/cloudinary.service';
 
 @Injectable()
 export class BoardsService {
-  constructor(@Inject(DB) private readonly db: DBType) {}
+  constructor(
+    @Inject(DB) private readonly db: DBType,
+    private readonly cloudinaryService: CloudinaryService,
+  ) {}
 
   async create(createBoardDto: CreateBoardDto) {
     try {
@@ -71,6 +76,18 @@ export class BoardsService {
       return res[0];
     } catch (error) {
       throw new InternalServerErrorException(`Cannot remove board . ${error}`);
+    }
+  }
+
+  async putCoverImage(file: Express.Multer.File, id: number) {
+    try {
+      const uploadedFile = await this.cloudinaryService.uploadImage(file);
+      const modifiedBoard = await this.update(id, {
+        imageUrl: (uploadedFile as any).url,
+      });
+      return modifiedBoard;
+    } catch (error) {
+      throw new BadRequestException(error);
     }
   }
 }
