@@ -7,7 +7,7 @@ import {
 import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
 import { DB, DBType } from '@/modules/global/providers/db.provider';
-import { user } from '@/modules/_schemas/user';
+import { user } from '@/_schemas/user';
 import { eq } from 'drizzle-orm';
 import { hashPassword } from '@/utils/password';
 

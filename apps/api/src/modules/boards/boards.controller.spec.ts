@@ -6,6 +6,23 @@ describe('BoardsController', () => {
   let controller: BoardsController;
 
   beforeEach(async () => {
+    describe('BoardsController', () => {
+      let controller: BoardsController;
+
+      beforeEach(async () => {
+        const module: TestingModule = await Test.createTestingModule({
+          controllers: [BoardsController],
+          providers: [BoardsService],
+        }).compile();
+
+        controller = module.get<BoardsController>(BoardsController);
+      });
+
+      it('should be defined', () => {
+        expect(controller).toBeDefined();
+      });
+    });
+
     const module: TestingModule = await Test.createTestingModule({
       controllers: [BoardsController],
       providers: [BoardsService],

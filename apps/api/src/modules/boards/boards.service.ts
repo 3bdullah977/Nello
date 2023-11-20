@@ -7,7 +7,7 @@ import {
 import { CreateBoardDto } from './dto/create-board.dto';
 import { UpdateBoardDto } from './dto/update-board.dto';
 import { DB, DBType } from '@/modules/global/providers/db.provider';
-import { board } from '@/modules/_schemas/board';
+import { board } from '@/_schemas/board';
 import { eq } from 'drizzle-orm';
 import { CloudinaryService } from '../cloudinary/cloudinary.service';
 
