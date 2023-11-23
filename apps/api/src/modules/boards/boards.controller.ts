@@ -14,6 +14,7 @@ import {
   UseInterceptors,
   UploadedFile,
   Req,
+  Put,
 } from '@nestjs/common';
 import { BoardsService } from './boards.service';
 import { CreateBoardDto } from './dto/create-board.dto';
@@ -27,6 +28,8 @@ import { FileInterceptor } from '../uploads/file-interceptor';
 import { imageFileFilter } from '@/utils/file-upload-util';
 import { CloudinaryService } from '../cloudinary/cloudinary.service';
 import CoverPhotoDto from '../uploads/dto/coverPhoto.dto';
+import { AddUserBoardDto } from './dto/add-user-board.dto';
+import { User } from '@/_schemas/user';
 
 @ApiTags('Boards')
 @ApiBearerAuth()
@@ -101,5 +104,43 @@ export class BoardsController {
     return ok('Cover uploaded successfully', {
       photoUrl: (uploadedCover as any).url,
     });
+  }
+
+  @Put('/addUserToBoard/:boardId')
+  async addUserToBoard(
+    @Body() addUserBoardDto: AddUserBoardDto,
+    @Param('boardId', ParseIntPipe) boardId: number,
+  ) {
+    const { userId } = addUserBoardDto;
+    let result: { board: Board; users: User[] };
+    const updatedBoardWithUsers = await this.boardsService.addUserToBoard(
+      userId,
+      boardId,
+    );
+
+    result.board = updatedBoardWithUsers[0]?.board;
+    result.users = updatedBoardWithUsers.map((ele) => {
+      const { user } = ele;
+      return user;
+    });
+
+    return ok('Added user to board successfully', {
+      boardWithUsers: result,
+    });
+  }
+
+  @Delete('/removeUserFromBoard/:boardId')
+  async removeUserFromBoard(
+    @Req() req,
+    @Body() input: AddUserBoardDto,
+    @Param('boardId', ParseIntPipe) boardId: number,
+  ) {
+    const { userId } = input;
+    const removedUser = await this.boardsService.removeUserFromBoard(
+      req.user.sub,
+      userId,
+      boardId,
+    );
+    return ok('Removed user from board successfully', removedUser);
   }
 }

@@ -3,19 +3,24 @@ import {
   Inject,
   Injectable,
   InternalServerErrorException,
+  UnauthorizedException,
 } from '@nestjs/common';
 import { CreateBoardDto } from './dto/create-board.dto';
 import { UpdateBoardDto } from './dto/update-board.dto';
 import { DB, DBType } from '@/modules/global/providers/db.provider';
 import { board } from '@/_schemas/board';
-import { eq } from 'drizzle-orm';
+import { eq, and } from 'drizzle-orm';
 import { CloudinaryService } from '../cloudinary/cloudinary.service';
+import { user, usersToBoards } from '@/_schemas/user';
+import { UsersService } from '../users/users.service';
+import { from } from 'rxjs';
 
 @Injectable()
 export class BoardsService {
   constructor(
     @Inject(DB) private readonly db: DBType,
     private readonly cloudinaryService: CloudinaryService,
+    private readonly usersService: UsersService,
   ) {}
 
   async create(createBoardDto: CreateBoardDto) {
@@ -89,5 +94,59 @@ export class BoardsService {
     } catch (error) {
       throw new BadRequestException(error);
     }
+  }
+
+  async addUserToBoard(userId: number, boardId: number) {
+    const found = await this.db
+      .select()
+      .from(usersToBoards)
+      .where(
+        and(
+          eq(usersToBoards.userId, userId),
+          eq(usersToBoards.boardId, boardId),
+        ),
+      );
+    if (found.length !== 0)
+      throw new BadRequestException('User already in this board');
+
+    await this.db.insert(usersToBoards).values({ userId, boardId });
+    const updatedBoard = await this.db
+      .select()
+      .from(board)
+      .leftJoin(usersToBoards, eq(board.id, usersToBoards.boardId))
+      .leftJoin(user, eq(user.id, usersToBoards.userId))
+      .where(eq(board.id, boardId));
+    return updatedBoard;
+  }
+
+  async removeUserFromBoard(
+    currentUserId: number,
+    userId: number,
+    boardId: number,
+  ) {
+    const thisBoard = await this.findOne(boardId);
+    const isCreatorIdMatched = thisBoard.creatorId === currentUserId;
+    if (!isCreatorIdMatched)
+      throw new UnauthorizedException('You are not the creator');
+
+    const user = await this.usersService.findOne(userId);
+    if (!user) throw new BadRequestException('User is not in this board');
+
+    try {
+      await this.db
+        .delete(usersToBoards)
+        .where(
+          and(
+            eq(usersToBoards.boardId, boardId),
+            eq(usersToBoards.userId, userId),
+          ),
+        );
+    } catch (error) {
+      throw new InternalServerErrorException(
+        `Cannot remove user from board. ${error}`,
+      );
+    }
+
+    return user;
   }
 }
