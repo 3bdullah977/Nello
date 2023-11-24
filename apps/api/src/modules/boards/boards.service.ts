@@ -13,7 +13,6 @@ import { eq, and } from 'drizzle-orm';
 import { CloudinaryService } from '../cloudinary/cloudinary.service';
 import { user, usersToBoards } from '@/_schemas/user';
 import { UsersService } from '../users/users.service';
-import { from } from 'rxjs';
 
 @Injectable()
 export class BoardsService {
@@ -124,8 +123,7 @@ export class BoardsService {
     userId: number,
     boardId: number,
   ) {
-    const thisBoard = await this.findOne(boardId);
-    const isCreatorIdMatched = thisBoard.creatorId === currentUserId;
+    const isCreatorIdMatched = this.checkIfCreator(boardId, currentUserId);
     if (!isCreatorIdMatched)
       throw new UnauthorizedException('You are not the creator');
 
@@ -148,5 +146,35 @@ export class BoardsService {
     }
 
     return user;
+  }
+
+  async toggleVisibility(currentUserId: number, boardId: number) {
+    try {
+      const isCreator = await this.checkIfCreator(boardId, currentUserId);
+      if (!isCreator)
+        throw new UnauthorizedException('You are not the creator');
+
+      const boardToUpdate = await this.findOne(boardId);
+
+      const updatedBoard = await this.db
+        .update(board)
+        .set({ isPrivate: !boardToUpdate.isPrivate })
+        .where(eq(board.id, boardId))
+        .returning();
+
+      return updatedBoard[0];
+    } catch (error) {
+      throw new InternalServerErrorException(
+        `Could not toggle visibility. ${error}`,
+      );
+    }
+  }
+
+  private async checkIfCreator(
+    boardId: number,
+    currentUserId: number,
+  ): Promise<boolean> {
+    const thisBoard = await this.findOne(boardId);
+    return thisBoard.creatorId === currentUserId;
   }
 }

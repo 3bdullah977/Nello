@@ -112,17 +112,14 @@ export class BoardsController {
     @Param('boardId', ParseIntPipe) boardId: number,
   ) {
     const { userId } = addUserBoardDto;
-    let result: { board: Board; users: User[] };
+    const result = { board: null, users: null };
     const updatedBoardWithUsers = await this.boardsService.addUserToBoard(
       userId,
       boardId,
     );
 
     result.board = updatedBoardWithUsers[0]?.board;
-    result.users = updatedBoardWithUsers.map((ele) => {
-      const { user } = ele;
-      return user;
-    });
+    result.users = updatedBoardWithUsers.map((ele) => ele.user);
 
     return ok('Added user to board successfully', {
       boardWithUsers: result,
@@ -142,5 +139,17 @@ export class BoardsController {
       boardId,
     );
     return ok('Removed user from board successfully', removedUser);
+  }
+
+  @Put('/toggleVisibility/:boardId')
+  async toggleVisibility(
+    @Req() req,
+    @Param('boardId', ParseIntPipe) boardId: number,
+  ) {
+    const updatedBoard = await this.boardsService.toggleVisibility(
+      req.user.sub,
+      boardId,
+    );
+    return ok('Toggled visibility successfully', updatedBoard);
   }
 }
