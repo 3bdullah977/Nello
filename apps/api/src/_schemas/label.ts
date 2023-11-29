@@ -1,5 +1,5 @@
 import { InferInsertModel, InferSelectModel } from 'drizzle-orm';
-import { serial, varchar } from 'drizzle-orm/pg-core';
+import { serial, timestamp, varchar } from 'drizzle-orm/pg-core';
 import { pgTable } from 'drizzle-orm/pg-core';
 import { card } from './card';
 import { board } from './board';
@@ -14,6 +14,8 @@ export const label = pgTable('label', {
   boardId: serial('board_id')
     .notNull()
     .references(() => board.id),
+  createdAt: timestamp('created_at').$defaultFn(() => new Date()),
+  updatedAt: timestamp('updated_at').$defaultFn(() => new Date()),
 });
 
 export type Label = InferSelectModel<typeof label>;

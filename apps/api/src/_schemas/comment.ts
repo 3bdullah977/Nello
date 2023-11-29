@@ -1,5 +1,5 @@
 import { InferInsertModel, InferSelectModel } from 'drizzle-orm';
-import { serial } from 'drizzle-orm/pg-core';
+import { serial, timestamp } from 'drizzle-orm/pg-core';
 import { pgTable, text } from 'drizzle-orm/pg-core';
 import { card } from './card';
 import { user } from './user';
@@ -13,6 +13,8 @@ export const comment = pgTable('comment', {
   cardId: serial('card_id')
     .notNull()
     .references(() => card.id),
+  createdAt: timestamp('created_at').$defaultFn(() => new Date()),
+  updatedAt: timestamp('updated_at').$defaultFn(() => new Date()),
 });
 
 export type Comment = InferSelectModel<typeof comment>;

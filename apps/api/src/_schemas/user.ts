@@ -1,5 +1,5 @@
 import { InferInsertModel, InferSelectModel, relations } from 'drizzle-orm';
-import { serial } from 'drizzle-orm/pg-core';
+import { serial, timestamp } from 'drizzle-orm/pg-core';
 import { boolean, pgTable, text } from 'drizzle-orm/pg-core';
 import { board } from './board';
 
@@ -10,6 +10,8 @@ export const user = pgTable('user', {
   email: text('email').notNull(),
   password: text('password').notNull(),
   imageUrl: text('image_url'),
+  createdAt: timestamp('created_at').$defaultFn(() => new Date()),
+  updatedAt: timestamp('updated_at').$defaultFn(() => new Date()),
 });
 
 export const userRelations = relations(user, ({ many }) => ({
