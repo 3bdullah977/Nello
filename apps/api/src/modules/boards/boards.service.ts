@@ -96,6 +96,9 @@ export class BoardsService {
   }
 
   async addUserToBoard(userId: number, boardId: number) {
+    const isCreator = await this.checkIfCreator(boardId, userId);
+    if (isCreator) throw new BadRequestException('This user is the creator');
+
     const found = await this.db
       .select()
       .from(usersToBoards)
@@ -145,7 +148,7 @@ export class BoardsService {
       );
     }
 
-    return user;
+    return { user, boardId };
   }
 
   async toggleVisibility(currentUserId: number, boardId: number) {
