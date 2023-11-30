@@ -22,14 +22,13 @@ import { UpdateBoardDto } from './dto/update-board.dto';
 import { ApiBearerAuth, ApiConsumes, ApiTags } from '@nestjs/swagger';
 import { QueryBoardDto } from './dto/query-board.dto';
 import { Board } from '@/_schemas/board';
-import { ok, res } from '@/utils/reponse-helper';
+import { ok, res } from '@/utils/response-helper';
 import LocalAuthGuard from '@/modules/auth/guards/jwt.guard';
 import { FileInterceptor } from '../uploads/file-interceptor';
 import { imageFileFilter } from '@/utils/file-upload-util';
 import { CloudinaryService } from '../cloudinary/cloudinary.service';
 import CoverPhotoDto from '../uploads/dto/coverPhoto.dto';
 import { AddUserBoardDto } from './dto/add-user-board.dto';
-import { User } from '@/_schemas/user';
 
 @ApiTags('Boards')
 @ApiBearerAuth()
