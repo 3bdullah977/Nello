@@ -5,7 +5,6 @@ import {
   Body,
   Patch,
   Param,
-  Delete,
   ParseIntPipe,
   Query,
   HttpStatus,
@@ -18,7 +17,7 @@ import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
 import { ApiBearerAuth, ApiTags } from '@nestjs/swagger';
 import { QueryUserDto } from './dto/query-user.dto';
-import { ok, res } from '@/utils/reponse-helper';
+import { ok, res } from '@/utils/response-helper';
 import { AuthGuard } from '@nestjs/passport';
 
 @ApiTags('Users')
@@ -27,7 +26,7 @@ import { AuthGuard } from '@nestjs/passport';
   version: '1',
 })
 export class UsersController {
-  constructor(private readonly usersService: UsersService) { }
+  constructor(private readonly usersService: UsersService) {}
 
   @Post()
   @HttpCode(201)
@@ -35,7 +34,7 @@ export class UsersController {
     return ok(
       'Created user successfully',
       await this.usersService.create(createUserDto),
-      true
+      true,
     );
   }
 
@@ -43,7 +42,7 @@ export class UsersController {
   @ApiBearerAuth()
   @UseGuards(AuthGuard('jwt'))
   async findAll(@Req() req, @Query() query: QueryUserDto) {
-    console.log(req)
+    console.log(req);
     const page = query?.page ?? 1;
     let limit = query?.limit ?? 10;
     if (limit > 50) {
@@ -67,21 +66,21 @@ export class UsersController {
   async update(
     @Param('id', ParseIntPipe) id: number,
     @Body() updateUserDto: UpdateUserDto,
+    @Req() req: Request,
   ) {
     const user = await this.usersService.findOne(id);
     if (!user) return res('No user with this id', HttpStatus.NOT_FOUND);
 
-    return ok(
-      'Updated user successfully',
-      await this.usersService.update(id, updateUserDto),
-    );
+    const updatedUser = await this.usersService.update(id, updateUserDto, req);
+
+    return ok('Updated user successfully', updatedUser);
   }
 
-  @Delete(':id')
-  async remove(@Param('id', ParseIntPipe) id: number) {
-    const user = await this.usersService.findOne(id);
-    if (!user) return res('No user with this id', HttpStatus.NOT_FOUND);
+  // @Delete(':id')
+  // async remove(@Param('id', ParseIntPipe) id: number) {
+  //   const user = await this.usersService.findOne(id);
+  //   if (!user) return res('No user with this id', HttpStatus.NOT_FOUND);
 
-    return ok('Removed user successfully', await this.usersService.remove(id));
-  }
+  //   return ok('Removed user successfully', await this.usersService.remove(id));
+  // }
 }
