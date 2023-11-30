@@ -13,11 +13,11 @@ import { eq } from 'drizzle-orm';
 export class ColumnsService {
   constructor(@Inject(DB) private readonly db: DBType) {}
 
-  async create(createColumnDto: CreateColumnDto) {
+  async create(createColumnDto: CreateColumnDto, boardId: number) {
     try {
       const newColumn = await this.db
         .insert(column)
-        .values(createColumnDto)
+        .values({ ...createColumnDto, boardId })
         .returning();
 
       return newColumn[0];
@@ -26,12 +26,13 @@ export class ColumnsService {
     }
   }
 
-  async findAll(page: number, limit: number) {
+  async findAll(page: number, limit: number, boardId: number) {
     try {
       const offset = (page - 1) * limit;
       const columns = await this.db
         .select()
         .from(column)
+        .where(eq(column.boardId, boardId))
         .limit(limit)
         .offset(offset);
 

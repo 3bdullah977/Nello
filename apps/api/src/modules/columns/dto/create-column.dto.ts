@@ -18,10 +18,5 @@ export class CreateColumnDto {
   @ApiProperty()
   @IsNumber()
   @IsNotEmpty()
-  boardId: number;
-
-  @ApiProperty()
-  @IsNumber()
-  @IsNotEmpty()
   position: number;
 }

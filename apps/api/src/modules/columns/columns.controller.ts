@@ -22,27 +22,33 @@ import LocalAuthGuard from '../auth/guards/jwt.guard';
 
 @ApiTags('Columns')
 @ApiBearerAuth()
-@Controller('columns')
+@Controller('boards/:boardId/columns')
 @UseGuards(LocalAuthGuard)
 export class ColumnsController {
   constructor(private readonly columnsService: ColumnsService) {}
 
   @Post()
   @HttpCode(201)
-  async create(@Body() createColumnDto: CreateColumnDto) {
+  async create(
+    @Body() createColumnDto: CreateColumnDto,
+    @Param('boardId', ParseIntPipe) boardId: number,
+  ) {
     if (!createColumnDto) return null;
-    const column = await this.columnsService.create(createColumnDto);
+    const column = await this.columnsService.create(createColumnDto, boardId);
     return ok('Created column successfully', column, true);
   }
 
   @Get()
-  async findAll(@Query() query: QueryColumnDto) {
+  async findAll(
+    @Query() query: QueryColumnDto,
+    @Param('boardId', ParseIntPipe) boardId: number,
+  ) {
     const page = query.page ?? 1;
     let limit = query.limit ?? 10;
     if (limit > 50) {
       limit = 50;
     }
-    const columns = await this.columnsService.findAll(page, limit);
+    const columns = await this.columnsService.findAll(page, limit, boardId);
     return ok('Found columns successfully', columns);
   }
 
