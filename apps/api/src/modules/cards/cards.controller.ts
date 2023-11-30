@@ -30,9 +30,12 @@ export class CardsController {
 
   @Post()
   @HttpCode(201)
-  async create(@Body() createCardDto: CreateCardDto) {
+  async create(
+    @Body() createCardDto: CreateCardDto,
+    @Param('columnId', ParseIntPipe) columnId: number,
+  ) {
     if (!createCardDto) throw new BadRequestException('Invalid Input');
-    const card = await this.cardsService.create(createCardDto);
+    const card = await this.cardsService.create(createCardDto, columnId);
     return ok('Created card successfully', card, true);
   }
 

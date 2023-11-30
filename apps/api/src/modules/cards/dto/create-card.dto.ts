@@ -4,7 +4,6 @@ import {
   IsNotEmpty,
   MinLength,
   MaxLength,
-  IsNumber,
   IsString,
 } from 'class-validator';
 
@@ -15,11 +14,6 @@ export class CreateCardDto {
   @MinLength(3)
   @MaxLength(100)
   title: string;
-
-  @ApiProperty()
-  @IsNumber()
-  @IsNotEmpty()
-  columnId: number;
 
   @ApiProperty()
   @IsString()

@@ -15,11 +15,11 @@ import { column } from '@/_schemas/column';
 export class CardsService {
   constructor(@Inject(DB) private readonly db: DBType) {}
 
-  async create(createCardDto: CreateCardDto) {
+  async create(createCardDto: CreateCardDto, columnId: number) {
     try {
       const newCard = await this.db
         .insert(card)
-        .values(createCardDto)
+        .values({ ...createCardDto, columnId })
         .returning();
 
       return newCard[0];
