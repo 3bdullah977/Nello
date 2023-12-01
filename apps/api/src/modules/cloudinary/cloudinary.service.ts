@@ -3,7 +3,10 @@ import { cloudinary } from './cloudinary';
 
 @Injectable()
 export class CloudinaryService {
-  async uploadImage(file: Express.Multer.File): Promise<object> {
+  async uploadImage(
+    file: Express.Multer.File,
+    folderName: 'boards_cover' | 'cards_cover',
+  ): Promise<object> {
     console.log(cloudinary.config.call(this));
     if (file.size > 10000000) throw new BadRequestException('Image size limit');
 
@@ -15,7 +18,7 @@ export class CloudinaryService {
       cloudinary.uploader
         .upload_stream(
           {
-            folder: 'boards_cover',
+            folder: folderName,
           },
           (error, result) => {
             if (error) {

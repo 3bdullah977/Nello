@@ -22,24 +22,20 @@ import { UpdateBoardDto } from './dto/update-board.dto';
 import { ApiBearerAuth, ApiConsumes, ApiTags } from '@nestjs/swagger';
 import { QueryBoardDto } from './dto/query-board.dto';
 import { Board } from '@/_schemas/board';
-import { ok, res } from '@/utils/reponse-helper';
+import { ok, res } from '@/utils/response-helper';
 import LocalAuthGuard from '@/modules/auth/guards/jwt.guard';
 import { FileInterceptor } from '../uploads/file-interceptor';
 import { imageFileFilter } from '@/utils/file-upload-util';
-import { CloudinaryService } from '../cloudinary/cloudinary.service';
 import CoverPhotoDto from '../uploads/dto/coverPhoto.dto';
 import { AddUserBoardDto } from './dto/add-user-board.dto';
-import { User } from '@/_schemas/user';
+import { Request } from 'express';
 
 @ApiTags('Boards')
 @ApiBearerAuth()
 @UseGuards(LocalAuthGuard)
 @Controller({ path: 'boards', version: '1' })
 export class BoardsController {
-  constructor(
-    private readonly boardsService: BoardsService,
-    private readonly cloudinaryService: CloudinaryService,
-  ) {}
+  constructor(private readonly boardsService: BoardsService) {}
 
   @Post()
   @HttpCode(201)
@@ -50,14 +46,14 @@ export class BoardsController {
   }
 
   @Get()
-  async findAll(@Query() query: QueryBoardDto) {
+  async findAll(@Query() query: QueryBoardDto, @Req() req: Request) {
     const page = query.page ?? 1;
     let limit = query.limit ?? 10;
     if (limit > 50) {
       limit = 50;
     }
-    const boards = await this.boardsService.findAll(page, limit);
-    return ok<Board[]>('Found boards successfully', boards);
+    const boards = await this.boardsService.findAll(page, limit, req);
+    return ok('Found boards successfully', boards);
   }
 
   @Get(':id')
@@ -72,14 +68,15 @@ export class BoardsController {
   async update(
     @Param('id', ParseIntPipe) id: number,
     @Body() updateBoardDto: UpdateBoardDto,
+    @Req() req: Request,
   ) {
-    const board = await this.boardsService.findOne(id);
-    if (!board) return res('No board with this id', HttpStatus.NOT_FOUND);
-
-    return ok<Board>(
-      'Updated board successfully',
-      await this.boardsService.update(id, updateBoardDto),
+    const updatedBoard = await this.boardsService.update(
+      id,
+      updateBoardDto,
+      req,
     );
+
+    return ok<Board>('Updated board successfully', updatedBoard);
   }
 
   @Delete(':id')
@@ -91,22 +88,27 @@ export class BoardsController {
   }
 
   @ApiConsumes('multipart/form-data')
-  @Post('/uploadCover')
+  @Post('/:boardId/uploadCover')
   @UseInterceptors(
     FileInterceptor('boardCover', { fileFilter: imageFileFilter }),
   )
   async uploadCover(
+    @Param('boardId', ParseIntPipe) boardId: number,
     @Req() req: Request,
     @UploadedFile() file: Express.Multer.File,
     @Body() _input: CoverPhotoDto,
   ) {
-    const uploadedCover = await this.cloudinaryService.uploadImage(file);
+    const updatedBoard = await this.boardsService.putCoverImage(
+      file,
+      boardId,
+      req,
+    );
     return ok('Cover uploaded successfully', {
-      photoUrl: (uploadedCover as any).url,
+      photoUrl: updatedBoard.imageUrl,
     });
   }
 
-  @Put('/addUserToBoard/:boardId')
+  @Put('/:boardId/addUserToBoard')
   async addUserToBoard(
     @Body() addUserBoardDto: AddUserBoardDto,
     @Param('boardId', ParseIntPipe) boardId: number,
@@ -126,7 +128,7 @@ export class BoardsController {
     });
   }
 
-  @Delete('/removeUserFromBoard/:boardId')
+  @Delete('/:boardId/removeUserFromBoard')
   async removeUserFromBoard(
     @Req() req,
     @Body() input: AddUserBoardDto,
@@ -141,7 +143,7 @@ export class BoardsController {
     return ok('Removed user from board successfully', removedUser);
   }
 
-  @Put('/toggleVisibility/:boardId')
+  @Put('/:boardId/toggleVisibility')
   async toggleVisibility(
     @Req() req,
     @Param('boardId', ParseIntPipe) boardId: number,

@@ -1,4 +1,10 @@
-import { integer, pgTable, serial, varchar } from 'drizzle-orm/pg-core';
+import {
+  integer,
+  pgTable,
+  serial,
+  timestamp,
+  varchar,
+} from 'drizzle-orm/pg-core';
 import { InferInsertModel, InferSelectModel } from 'drizzle-orm';
 import { board } from './board';
 
@@ -9,6 +15,8 @@ export const column = pgTable('column', {
   boardId: serial('board_id')
     .references(() => board.id)
     .notNull(),
+  createdAt: timestamp('created_at').$defaultFn(() => new Date()),
+  updatedAt: timestamp('updated_at').$defaultFn(() => new Date()),
 });
 
 export type Column = InferSelectModel<typeof column>;

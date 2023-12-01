@@ -3,6 +3,7 @@ import {
   Inject,
   Injectable,
   InternalServerErrorException,
+  UnprocessableEntityException,
 } from '@nestjs/common';
 import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
@@ -62,7 +63,10 @@ export class UsersService {
     }
   }
 
-  async update(id: number, updateUserDto: UpdateUserDto) {
+  async update(id: number, updateUserDto: UpdateUserDto, req: any) {
+    const isSameId = req.user.sub === id;
+    if (!isSameId)
+      throw new UnprocessableEntityException('Cannot update this user');
     try {
       const res = await this.db
         .update(user)

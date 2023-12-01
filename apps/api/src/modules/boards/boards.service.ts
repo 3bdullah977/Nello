@@ -4,12 +4,13 @@ import {
   Injectable,
   InternalServerErrorException,
   UnauthorizedException,
+  UnprocessableEntityException,
 } from '@nestjs/common';
 import { CreateBoardDto } from './dto/create-board.dto';
 import { UpdateBoardDto } from './dto/update-board.dto';
 import { DB, DBType } from '@/modules/global/providers/db.provider';
-import { board } from '@/_schemas/board';
-import { eq, and } from 'drizzle-orm';
+import { Board, board } from '@/_schemas/board';
+import { eq, and, or } from 'drizzle-orm';
 import { CloudinaryService } from '../cloudinary/cloudinary.service';
 import { user, usersToBoards } from '@/_schemas/user';
 import { UsersService } from '../users/users.service';
@@ -34,15 +35,35 @@ export class BoardsService {
     }
   }
 
-  async findAll(page: number, limit: number) {
+  async findAll(page: number, limit: number, req: any) {
     try {
+      const currentUserId = req.user.sub;
       const offset = (page - 1) * limit;
-      const res = await this.db
+      const res1 = await this.db
         .select()
         .from(board)
+        .leftJoin(user, eq(board.creatorId, user.id))
+        .leftJoin(usersToBoards, eq(board.id, usersToBoards.boardId))
+        .where(
+          and(
+            eq(board.isPrivate, true),
+            or(
+              eq(usersToBoards.userId, currentUserId),
+              eq(board.creatorId, currentUserId),
+            ),
+          ),
+        )
         .limit(limit)
         .offset(offset);
-      return res;
+      const res2 = await this.db
+        .select()
+        .from(board)
+        .where(eq(board.isPrivate, false))
+        .limit(limit)
+        .offset(offset);
+
+      const result: Board[] = res1.map((item) => item.board).concat(res2);
+      return result;
     } catch (error) {
       throw new InternalServerErrorException(`Cannot find boards. ${error}`);
     }
@@ -57,7 +78,12 @@ export class BoardsService {
     }
   }
 
-  async update(id: number, updateBoardDto: UpdateBoardDto) {
+  async update(id: number, updateBoardDto: UpdateBoardDto, req: any) {
+    const foundBoard = await this.findOne(id);
+    if (!foundBoard) throw new BadRequestException('Board not found');
+    const isSameId = req.user.sub === board.creatorId;
+    if (!isSameId)
+      throw new UnprocessableEntityException('You are not the creator');
     try {
       const res = await this.db
         .update(board)
@@ -83,12 +109,21 @@ export class BoardsService {
     }
   }
 
-  async putCoverImage(file: Express.Multer.File, id: number) {
+  async putCoverImage(file: Express.Multer.File, id: number, req: any) {
+    const isCreator = await this.checkIfCreator(id, req.sub.id);
+    if (!isCreator) throw new BadRequestException('You are not the creator');
     try {
-      const uploadedFile = await this.cloudinaryService.uploadImage(file);
-      const modifiedBoard = await this.update(id, {
-        imageUrl: (uploadedFile as any).url,
-      });
+      const uploadedFile = await this.cloudinaryService.uploadImage(
+        file,
+        'boards_cover',
+      );
+      const modifiedBoard = await this.update(
+        id,
+        {
+          imageUrl: (uploadedFile as any).url,
+        },
+        req,
+      );
       return modifiedBoard;
     } catch (error) {
       throw new BadRequestException(error);
@@ -96,6 +131,9 @@ export class BoardsService {
   }
 
   async addUserToBoard(userId: number, boardId: number) {
+    const isCreator = await this.checkIfCreator(boardId, userId);
+    if (isCreator) throw new BadRequestException('This user is the creator');
+
     const found = await this.db
       .select()
       .from(usersToBoards)
@@ -145,7 +183,7 @@ export class BoardsService {
       );
     }
 
-    return user;
+    return { user, boardId };
   }
 
   async toggleVisibility(currentUserId: number, boardId: number) {

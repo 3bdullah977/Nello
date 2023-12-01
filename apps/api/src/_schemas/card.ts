@@ -1,4 +1,4 @@
-import { pgTable, serial, text, varchar } from 'drizzle-orm/pg-core';
+import { pgTable, serial, text, timestamp, varchar } from 'drizzle-orm/pg-core';
 import { InferInsertModel, InferSelectModel } from 'drizzle-orm';
 import { column } from './column';
 
@@ -10,6 +10,8 @@ export const card = pgTable('card', {
   columnId: serial('column_id')
     .notNull()
     .references(() => column.id),
+  createdAt: timestamp('created_at').$defaultFn(() => new Date()),
+  updatedAt: timestamp('updated_at').$defaultFn(() => new Date()),
 });
 
 export type Card = InferSelectModel<typeof card>;
