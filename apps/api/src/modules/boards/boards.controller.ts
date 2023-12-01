@@ -129,8 +129,14 @@ export class BoardsController {
   }
 
   @Get('/:boardId/listBoardMemebers')
-  async listBoardMembers(@Param('boardId', ParseIntPipe) boardId: number) {
-    const members = await this.boardsService.listBoardMembers(boardId);
+  async listBoardMembers(
+    @Req() req: any,
+    @Param('boardId', ParseIntPipe) boardId: number,
+  ) {
+    const members = await this.boardsService.listBoardMembers(
+      boardId,
+      req.user.sub,
+    );
     return ok('Members found successfully', members);
   }
 
