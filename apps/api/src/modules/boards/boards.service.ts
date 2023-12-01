@@ -157,6 +157,31 @@ export class BoardsService {
     return updatedBoard;
   }
 
+  async listBoardMembers(boardId: number, currentUserId: number) {
+    const thisBoard = await this.db
+      .select()
+      .from(board)
+      .where(eq(board.id, boardId));
+    if (thisBoard.length === 0)
+      throw new NotFoundException('Board does not exist');
+    const boardMembers = await this.db
+      .select()
+      .from(board)
+      .leftJoin(usersToBoards, eq(board.id, usersToBoards.boardId))
+      .leftJoin(user, eq(user.id, usersToBoards.userId));
+    const result = boardMembers.map((item) => item.user);
+
+    const isCreator = await this.checkIfCreator(boardId, currentUserId);
+    if (isCreator) {
+      const creator = await this.db
+        .select()
+        .from(user)
+        .where(eq(user.id, currentUserId));
+      result.push(creator[0]);
+    }
+    return result;
+  }
+
   async removeUserFromBoard(
     currentUserId: number,
     userId: number,
