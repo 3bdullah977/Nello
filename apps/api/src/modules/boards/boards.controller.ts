@@ -88,7 +88,7 @@ export class BoardsController {
   }
 
   @ApiConsumes('multipart/form-data')
-  @Post('/:boardId/uploadCover')
+  @Put('/:boardId/uploadCover')
   @UseInterceptors(
     FileInterceptor('boardCover', { fileFilter: imageFileFilter }),
   )
