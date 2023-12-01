@@ -3,6 +3,7 @@ import {
   Inject,
   Injectable,
   InternalServerErrorException,
+  NotFoundException,
   UnauthorizedException,
   UnprocessableEntityException,
 } from '@nestjs/common';
@@ -213,6 +214,7 @@ export class BoardsService {
     currentUserId: number,
   ): Promise<boolean> {
     const thisBoard = await this.findOne(boardId);
+    if (!thisBoard) throw new NotFoundException('Cannot find board');
     return thisBoard.creatorId === currentUserId;
   }
 }
