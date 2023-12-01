@@ -113,7 +113,10 @@ export class BoardsService {
     const isCreator = await this.checkIfCreator(id, req.sub.id);
     if (!isCreator) throw new BadRequestException('You are not the creator');
     try {
-      const uploadedFile = await this.cloudinaryService.uploadImage(file);
+      const uploadedFile = await this.cloudinaryService.uploadImage(
+        file,
+        'boards_cover',
+      );
       const modifiedBoard = await this.update(
         id,
         {
