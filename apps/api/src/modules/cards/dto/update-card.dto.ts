@@ -1,23 +1,27 @@
 import { PartialType } from '@nestjs/mapped-types';
 import { CreateCardDto } from './create-card.dto';
-import { IsAlphanumeric, IsNumber, IsString, MaxLength } from 'class-validator';
+import { IsNumber, IsOptional, IsString, MaxLength } from 'class-validator';
 import { ApiProperty } from '@nestjs/swagger';
 
 export class UpdateCardDto extends PartialType(CreateCardDto) {
   @ApiProperty()
-  @IsAlphanumeric()
+  @IsString()
+  @IsOptional()
   @MaxLength(100)
-  title: string;
+  title?: string;
 
   @ApiProperty()
+  @IsOptional()
   @IsNumber()
-  columnId: number;
+  columnId?: number;
 
   @ApiProperty()
+  @IsOptional()
   @IsString()
-  description: string;
+  description?: string;
 
   @ApiProperty()
+  @IsOptional()
   @IsString()
-  coverImage: string;
+  coverImage?: string;
 }
