@@ -128,6 +128,12 @@ export class BoardsController {
     });
   }
 
+  @Get('/:boardId/listBoardMemebers')
+  async listBoardMembers(@Param('boardId', ParseIntPipe) boardId: number) {
+    const members = await this.boardsService.listBoardMembers(boardId);
+    return ok('Members found successfully', members);
+  }
+
   @Delete('/:boardId/removeUserFromBoard')
   async removeUserFromBoard(
     @Req() req,
