@@ -9,12 +9,18 @@ import { ValidationPipe } from '@nestjs/common';
 import fastifyHelmet from '@fastify/helmet';
 import { contentParser } from 'fastify-multer';
 import { join } from 'path';
+import { config } from 'dotenv';
+config();
 
 async function bootstrap() {
   const app = await NestFactory.create<NestFastifyApplication>(
     AppModule,
     new FastifyAdapter({ logger: true }),
   );
+
+  app.enableCors({
+    origin: process.env.CORS_ORIGIN,
+  });
 
   const config = new DocumentBuilder()
     .setTitle('Nello')
