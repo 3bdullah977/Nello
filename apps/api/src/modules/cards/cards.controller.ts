@@ -12,14 +12,22 @@ import {
   Query,
   ParseIntPipe,
   HttpStatus,
+  UseInterceptors,
+  UploadedFile,
+  Put,
+  Req,
 } from '@nestjs/common';
 import { CardsService } from './cards.service';
 import { CreateCardDto } from './dto/create-card.dto';
 import { UpdateCardDto } from './dto/update-card.dto';
-import { ApiBearerAuth, ApiTags } from '@nestjs/swagger';
+import { ApiBearerAuth, ApiConsumes, ApiTags } from '@nestjs/swagger';
 import LocalAuthGuard from '../auth/guards/jwt.guard';
 import { QueryColumnDto } from '../columns/dto/query-column.dto';
 import { res, ok } from '@/utils/response-helper';
+import { FileInterceptor } from '../uploads/file-interceptor';
+import { imageFileFilter } from '@/utils/file-upload-util';
+import { CardCoverDto } from './dto/card-cover.dto';
+import { Request } from 'express';
 
 @ApiTags('Cards')
 @ApiBearerAuth()
@@ -63,6 +71,7 @@ export class CardsController {
 
   @Patch(':id')
   async update(
+    @Req() req: Request,
     @Param('id', ParseIntPipe) id: number,
     @Body() updateCardDto: UpdateCardDto,
   ) {
@@ -71,7 +80,7 @@ export class CardsController {
 
     return ok(
       'Updated card successfully',
-      await this.cardsService.update(id, updateCardDto),
+      await this.cardsService.update(id, updateCardDto, req),
     );
   }
 
@@ -81,5 +90,24 @@ export class CardsController {
     if (!card) return res('No card with this id', HttpStatus.NOT_FOUND);
 
     return ok('Removed card successfully', card);
+  }
+
+  @ApiConsumes('multipart/form-data')
+  @Put(':cardId/uploadCover')
+  @UseInterceptors(
+    FileInterceptor('cardCover', { fileFilter: imageFileFilter }),
+  )
+  async uploadCover(
+    @Req() req: Request,
+    @Param('cardId', ParseIntPipe) cardId: number,
+    @UploadedFile() file: Express.Multer.File,
+    @Body() _input: CardCoverDto,
+  ) {
+    const updatedCard = await this.cardsService.putCoverImage(
+      file,
+      cardId,
+      req,
+    );
+    return ok('Uploaded cover successfully', updatedCard.coverImage);
   }
 }
