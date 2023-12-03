@@ -1,3 +1,4 @@
+import axios from 'axios'
 export type CreateUserInput = {
     username: string;
     password: string;
@@ -5,7 +6,8 @@ export type CreateUserInput = {
 }
 
 const baseUrl = 'http://localhost:3001/api/users'
-export const createUser = (data: CreateUserInput) => {
+export const createUser = async (data: CreateUserInput) => {
     const url = baseUrl
+    const user = await axios
 
 }
