@@ -54,6 +54,18 @@ export class UsersService {
     }
   }
 
+  async findByName(username: string) {
+    try {
+      const res = await this.db
+        .select()
+        .from(user)
+        .where(eq(user.username, username));
+      return res[0];
+    } catch (error) {
+      throw new InternalServerErrorException(`Cannot retrieve user. ${error}`);
+    }
+  }
+
   async findOne(id: number) {
     try {
       const res = await this.db.select().from(user).where(eq(user.id, id));
