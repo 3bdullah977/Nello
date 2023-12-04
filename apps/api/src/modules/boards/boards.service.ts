@@ -217,6 +217,9 @@ export class BoardsService {
     if (!isCreatorIdMatched)
       throw new UnauthorizedException('You are not the creator');
 
+    if (userId === (await this.findOne(boardId)).creatorId)
+      throw new BadRequestException('Cannot remove the creator');
+
     const user = await this.usersService.findOne(userId);
     if (!user) throw new BadRequestException('User is not in this board');
 
