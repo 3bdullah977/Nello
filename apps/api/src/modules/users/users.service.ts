@@ -9,7 +9,7 @@ import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
 import { DB, DBType } from '@/modules/global/providers/db.provider';
 import { user } from '@/_schemas/user';
-import { eq } from 'drizzle-orm';
+import { eq, like } from 'drizzle-orm';
 import { hashPassword } from '@/utils/password';
 
 @Injectable()
@@ -59,8 +59,8 @@ export class UsersService {
       const res = await this.db
         .select()
         .from(user)
-        .where(eq(user.username, username));
-      return res[0];
+        .where(like(user.username, `${username}%`));
+      return res;
     } catch (error) {
       throw new InternalServerErrorException(`Cannot retrieve user. ${error}`);
     }

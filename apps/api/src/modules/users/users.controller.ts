@@ -69,7 +69,7 @@ export class UsersController {
   @UseGuards(AuthGuard('jwt'))
   async findByName(@Param('username') username: string) {
     const user = await this.usersService.findByName(username);
-    if (!user) return res('No user with this id', HttpStatus.NOT_FOUND);
+    if (!user) return res('No user with this name', HttpStatus.NOT_FOUND);
 
     return ok('Found user successfully', user);
   }
