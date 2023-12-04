@@ -36,8 +36,11 @@ export class DocumentsController {
     @Param('boardId', ParseIntPipe) boardId: number,
   ) {
     if (!createDocumentDto) throw new BadRequestException('Invalid Input');
-    const card = await this.documentsService.create(createDocumentDto, boardId);
-    return ok('Created card successfully', card, true);
+    const document = await this.documentsService.create(
+      createDocumentDto,
+      boardId,
+    );
+    return ok('Created document successfully', document, true);
   }
 
   @Get()

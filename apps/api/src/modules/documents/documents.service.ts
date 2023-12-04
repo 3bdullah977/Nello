@@ -16,11 +16,11 @@ import { usersToBoards } from '@/_schemas/user';
 @Injectable()
 export class DocumentsService {
   constructor(@Inject(DB) private readonly db: DBType) {}
-  async create(createCardDto: CreateDocumentDto, boardId: number) {
+  async create(createDocumentDto: CreateDocumentDto, boardId: number) {
     try {
       const newCard = await this.db
         .insert(document)
-        .values({ ...createCardDto, boardId })
+        .values({ ...createDocumentDto, boardId })
         .returning();
 
       return newCard[0];
@@ -32,11 +32,11 @@ export class DocumentsService {
   }
 
   async findAll(page: number, limit: number, boardId: number) {
-    const foundColumn = await this.db
+    const foundBoard = await this.db
       .select()
       .from(board)
       .where(eq(board.id, boardId));
-    if (foundColumn.length <= 0)
+    if (foundBoard.length <= 0)
       throw new NotFoundException('No board with such id');
 
     try {
@@ -56,12 +56,12 @@ export class DocumentsService {
 
   async findOne(id: number) {
     try {
-      const foundCard = await this.db
+      const foundDocument = await this.db
         .select()
         .from(document)
         .where(eq(document.id, id));
 
-      return foundCard[0];
+      return foundDocument[0];
     } catch (error) {
       throw new InternalServerErrorException(`Cannot find document. ${error}`);
     }
@@ -69,7 +69,7 @@ export class DocumentsService {
 
   async update(
     id: number,
-    updateCardDto: UpdateDocumentDto,
+    updateDocumentDto: UpdateDocumentDto,
     req: any,
     boardId: number,
   ) {
@@ -87,7 +87,7 @@ export class DocumentsService {
     try {
       const updatedDocument = await this.db
         .update(document)
-        .set({ ...updateCardDto, updatedAt: new Date() })
+        .set({ ...updateDocumentDto, updatedAt: new Date() })
         .where(eq(document.id, id))
         .returning();
 
@@ -112,12 +112,12 @@ export class DocumentsService {
         'You are not a member of this board',
       );
     try {
-      const removedCard = await this.db
+      const removedDocument = await this.db
         .delete(document)
         .where(eq(document.id, id))
         .returning();
 
-      return removedCard[0];
+      return removedDocument[0];
     } catch (error) {
       throw new InternalServerErrorException(
         `Cannot remove document. ${error}`,
