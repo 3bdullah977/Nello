@@ -70,7 +70,7 @@ export class UsersService {
     try {
       const res = await this.db
         .update(user)
-        .set(updateUserDto)
+        .set({ ...updateUserDto, updatedAt: new Date() })
         .where(eq(user.id, id))
         .returning();
       return res[0];

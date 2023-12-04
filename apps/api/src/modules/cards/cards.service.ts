@@ -97,7 +97,7 @@ export class CardsService {
     try {
       const updatedCard = await this.db
         .update(card)
-        .set(updateCardDto)
+        .set({ ...updateCardDto, updatedAt: new Date() })
         .where(eq(card.id, id))
         .returning();
 

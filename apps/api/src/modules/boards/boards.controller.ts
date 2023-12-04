@@ -49,10 +49,16 @@ export class BoardsController {
   async findAll(@Query() query: QueryBoardDto, @Req() req: Request) {
     const page = query.page ?? 1;
     let limit = query.limit ?? 10;
+    const withMembers = query.withMembers === 'true' ? true : false;
     if (limit > 50) {
       limit = 50;
     }
-    const boards = await this.boardsService.findAll(page, limit, req);
+    const boards = await this.boardsService.findAll(
+      page,
+      limit,
+      withMembers,
+      req,
+    );
     return ok('Found boards successfully', boards);
   }
 
@@ -62,6 +68,14 @@ export class BoardsController {
     if (!board) return res('No board with this id', HttpStatus.NOT_FOUND);
 
     return ok<Board>('Found board successfully', board);
+  }
+
+  @Get('/:boardName/getByName')
+  async findByName(@Param('boardName') boardName: string) {
+    const boards = await this.boardsService.findByName(boardName);
+    if (!boards) return res('No board with this name', HttpStatus.NOT_FOUND);
+
+    return ok('Found board successfully', boards);
   }
 
   @Patch(':id')

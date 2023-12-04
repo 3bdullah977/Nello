@@ -1,6 +1,6 @@
 import { ApiProperty } from '@nestjs/swagger';
 import { Transform } from 'class-transformer';
-import { IsNumber, IsOptional } from 'class-validator';
+import { IsNumber, IsOptional, IsString } from 'class-validator';
 
 export class QueryBoardDto {
   @ApiProperty({ required: false })
@@ -14,4 +14,10 @@ export class QueryBoardDto {
   @IsNumber()
   @IsOptional()
   limit: number;
+
+  @ApiProperty({ required: false, type: 'boolean' })
+  // @Transform(({ value }) => (value === 'true' ? true : false))
+  @IsString({ groups: ['true', 'false'] })
+  @IsOptional()
+  withMembers: string;
 }

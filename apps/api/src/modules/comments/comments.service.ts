@@ -75,7 +75,7 @@ export class CommentsService {
     try {
       const updatedComment = await this.db
         .update(comment)
-        .set(updateCommentDto)
+        .set({ ...updateCommentDto, updatedAt: new Date() })
         .where(eq(comment.id, id))
         .returning();
 

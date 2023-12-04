@@ -59,7 +59,7 @@ export class ColumnsService {
     try {
       const updatedColumn = await this.db
         .update(column)
-        .set(updateColumnDto)
+        .set({ ...updateColumnDto, updatedAt: new Date() })
         .where(eq(column.id, id))
         .returning();
 
