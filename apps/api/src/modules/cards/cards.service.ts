@@ -72,7 +72,12 @@ export class CardsService {
     }
   }
 
-  async update(id: number, updateCardDto: UpdateCardDto, req: any) {
+  async update(
+    id: number,
+    updateCardDto: UpdateCardDto,
+    req: any,
+    boardId: number,
+  ) {
     if (updateCardDto.columnId) {
       const toMoveColumn = await this.db
         .select()
@@ -83,7 +88,7 @@ export class CardsService {
         throw new NotFoundException('Column does not exist');
     }
 
-    const found = await this.isInBoardMembers(req.user.sub, id);
+    const found = await this.isInBoardMembers(req.user.sub, boardId);
 
     const boardCreator = await this.db
       .select()
@@ -120,7 +125,12 @@ export class CardsService {
     }
   }
 
-  async putCoverImage(file: Express.Multer.File, id: number, req: any) {
+  async putCoverImage(
+    file: Express.Multer.File,
+    id: number,
+    req: any,
+    boardId: number,
+  ) {
     try {
       const uploadedFile = await this.cloudinaryService.uploadImage(
         file,
@@ -132,6 +142,7 @@ export class CardsService {
           coverImage: (uploadedFile as any).url,
         },
         req,
+        boardId,
       );
       return modifiedBoard;
     } catch (error) {
@@ -139,21 +150,14 @@ export class CardsService {
     }
   }
 
-  private async isInBoardMembers(userId: number, cardId: number) {
-    const colCardBoard = await this.db
-      .select()
-      .from(board)
-      .leftJoin(column, eq(board.id, column.boardId))
-      .leftJoin(card, eq(card.columnId, column.id))
-      .where(eq(card.id, cardId));
-
+  private async isInBoardMembers(userId: number, boardId: number) {
     const found = await this.db
       .select()
       .from(usersToBoards)
       .where(
         and(
           eq(usersToBoards.userId, userId),
-          eq(usersToBoards.boardId, colCardBoard[0].board.id),
+          eq(usersToBoards.boardId, boardId),
         ),
       );
     return found;

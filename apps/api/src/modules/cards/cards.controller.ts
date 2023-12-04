@@ -73,6 +73,7 @@ export class CardsController {
   async update(
     @Req() req: Request,
     @Param('id', ParseIntPipe) id: number,
+    @Param('boardId', ParseIntPipe) boardId: number,
     @Body() updateCardDto: UpdateCardDto,
   ) {
     const card = await this.cardsService.findOne(id);
@@ -80,7 +81,7 @@ export class CardsController {
 
     return ok(
       'Updated card successfully',
-      await this.cardsService.update(id, updateCardDto, req),
+      await this.cardsService.update(id, updateCardDto, req, boardId),
     );
   }
 
@@ -100,6 +101,7 @@ export class CardsController {
   async uploadCover(
     @Req() req: Request,
     @Param('cardId', ParseIntPipe) cardId: number,
+    @Param('boardId', ParseIntPipe) boardId: number,
     @UploadedFile() file: Express.Multer.File,
     @Body() _input: CardCoverDto,
   ) {
@@ -107,6 +109,7 @@ export class CardsController {
       file,
       cardId,
       req,
+      boardId,
     );
     return ok('Uploaded cover successfully', updatedCard.coverImage);
   }
