@@ -193,7 +193,8 @@ export class BoardsService {
       .select()
       .from(user)
       .leftJoin(usersToBoards, eq(user.id, usersToBoards.userId))
-      .leftJoin(board, eq(board.id, usersToBoards.boardId));
+      .leftJoin(board, eq(board.id, usersToBoards.boardId))
+      .where(eq(board.id, boardId));
 
     const result = boardMembers.map((item) => item.user);
 
@@ -213,25 +214,36 @@ export class BoardsService {
     userId: number,
     boardId: number,
   ) {
-    const isCreatorIdMatched = this.checkIfCreator(boardId, currentUserId);
-    if (!isCreatorIdMatched)
-      throw new UnauthorizedException('You are not the creator');
+    try {
+      const user = await this.usersService.findOne(userId);
+      if (!user) throw new BadRequestException('Could not find this user');
 
-    if (userId === (await this.findOne(boardId)).creatorId)
-      throw new BadRequestException('Cannot remove the creator');
+      const isCreatorIdMatched = this.checkIfCreator(boardId, currentUserId);
+      if (!isCreatorIdMatched)
+        throw new UnauthorizedException('You are not the creator');
 
-    const user = await this.usersService.findOne(userId);
-    if (!user) throw new BadRequestException('User is not in this board');
+      if (userId === (await this.findOne(boardId)).creatorId)
+        throw new BadRequestException('Cannot remove the creator');
+
+      const isUserInBoard = await this.isInBoardMembers(userId, boardId);
+      if (isUserInBoard.length === 0)
+        throw new BadRequestException('User is not in this board');
+    } catch (e) {
+      throw e;
+    }
 
     try {
-      await this.db
-        .delete(usersToBoards)
-        .where(
-          and(
-            eq(usersToBoards.boardId, boardId),
-            eq(usersToBoards.userId, userId),
-          ),
-        );
+      console.log(
+        await this.db
+          .delete(usersToBoards)
+          .where(
+            and(
+              eq(usersToBoards.boardId, boardId),
+              eq(usersToBoards.userId, userId),
+            ),
+          )
+          .returning(),
+      );
     } catch (error) {
       throw new InternalServerErrorException(
         `Cannot remove user from board. ${error}`,
@@ -270,5 +282,18 @@ export class BoardsService {
     const thisBoard = await this.findOne(boardId);
     if (!thisBoard) throw new NotFoundException('Cannot find board');
     return thisBoard.creatorId === currentUserId;
+  }
+
+  private async isInBoardMembers(userId: number, boardId: number) {
+    const found = await this.db
+      .select()
+      .from(usersToBoards)
+      .where(
+        and(
+          eq(usersToBoards.userId, userId),
+          eq(usersToBoards.boardId, boardId),
+        ),
+      );
+    return found;
   }
 }
