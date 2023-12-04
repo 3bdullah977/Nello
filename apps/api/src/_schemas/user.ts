@@ -1,12 +1,11 @@
 import { InferInsertModel, InferSelectModel, relations } from 'drizzle-orm';
 import { serial, timestamp } from 'drizzle-orm/pg-core';
-import { boolean, pgTable, text } from 'drizzle-orm/pg-core';
+import { pgTable, text } from 'drizzle-orm/pg-core';
 import { board } from './board';
 
 export const user = pgTable('user', {
   id: serial('id').primaryKey(),
   username: text('username').notNull(),
-  isAdmin: boolean('is_admin').notNull().default(false),
   email: text('email').notNull(),
   password: text('password').notNull(),
   imageUrl: text('image_url'),
