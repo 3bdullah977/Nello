@@ -11,11 +11,10 @@ import { CreateBoardDto } from './dto/create-board.dto';
 import { UpdateBoardDto } from './dto/update-board.dto';
 import { DB, DBType } from '@/modules/global/providers/db.provider';
 import { Board, board } from '@/_schemas/board';
-import { eq, and, or, sql, like } from 'drizzle-orm';
+import { eq, and, sql, like } from 'drizzle-orm';
 import { CloudinaryService } from '../cloudinary/cloudinary.service';
 import { User, user, usersToBoards } from '@/_schemas/user';
 import { UsersService } from '../users/users.service';
-import { unique } from 'drizzle-orm/pg-core';
 
 @Injectable()
 export class BoardsService {
