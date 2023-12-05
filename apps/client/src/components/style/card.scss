@@ -1,0 +1,48 @@
+.card {
+  width: 100%;
+  margin-top: 1rem;
+  @media screen and (max-width: 1220px) {
+    min-width: 18rem;
+  }
+  img {
+    width: 100%;
+  }
+  .lines {
+    display: flex;
+    gap: 0.5rem;
+    margin: 15px 0px 15px 0px;
+    .line {
+      width: 3rem;
+      height: 0.5rem;
+      border-radius: 20px;
+    }
+  }
+  .card-footer {
+    display: flex;
+    justify-content: space-between;
+    .avatar {
+      .icon:first-child {
+        z-index: 0;
+      }
+      .icon:nth-child(2) {
+        z-index: 1;
+        left: -10%;
+      }
+      .icon:last-child {
+        z-index: 2;
+        left: -20%;
+      }
+    }
+    .social {
+      display: flex;
+      gap: 0.5rem;
+      align-items: center;
+      .svg {
+        width: 1.3rem;
+      }
+      .element p {
+        font-size: 0.9rem;
+      }
+    }
+  }
+}

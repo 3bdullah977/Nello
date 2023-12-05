@@ -1,0 +1,29 @@
+@import url("https://fonts.googleapis.com/css2?family=Cookie&display=swap");
+.nav {
+  min-height: 10vh;
+  @media screen and (max-width: 1220px) {
+    padding: 12px;
+  }
+  .left {
+    .logo {
+      h1 {
+        font-size: 2rem;
+        font-family: "Cookie", cursive;
+        color: rgb(220, 38, 38);
+      }
+    }
+    @media screen and (max-width: 1220px) {
+      gap: 1rem;
+    }
+    .input {
+      @media screen and (max-width: 1220px) {
+        width: 100%;
+      }
+    }
+  }
+  .right {
+    @media screen and (max-width: 1220px) {
+      gap: 1rem;
+    }
+  }
+}
