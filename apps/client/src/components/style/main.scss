@@ -1,0 +1,62 @@
+.main {
+  display: grid;
+  grid-template-columns: repeat(5, 1fr);
+  column-gap: 1rem;
+  height: 90vh;
+  .column {
+    width: 100%;
+    overflow-y: scroll;
+    .title {
+      margin-top: 16px;
+      @media screen and (max-width: 1220px) {
+        writing-mode: vertical-lr;
+      }
+    }
+    .add-card {
+      @media screen and (max-width: 1220px) {
+        transform: translateY(100%);
+      }
+    }
+    @media screen and (max-width: 1220px) {
+      display: flex;
+      gap: 1rem;
+      min-height: 23rem;
+    }
+  }
+  * {
+    scrollbar-width: thin;
+    scrollbar-color: rgba(155, 155, 155, 0.7) transparent;
+  }
+
+  /* Works on Chrome/Edge/Safari */
+  *::-webkit-scrollbar {
+    width: 5px;
+    height: 5px;
+  }
+  *::-webkit-scrollbar-track {
+    background: transparent;
+  }
+  *::-webkit-scrollbar-thumb {
+    background-color: rgba(155, 155, 155, 0.7);
+    border-radius: 20px;
+    border: transparent;
+  }
+
+  @media screen and (max-width: 1220px) {
+    display: grid;
+    grid-template-rows: repeat(5, 1fr);
+    row-gap: 1rem;
+    grid-template-columns: 1fr;
+    min-height: 100vh;
+  }
+}
+
+.gallery {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(100px, 1fr));
+  padding: 0.5rem 0rem;
+  width: 100%;
+  margin: auto;
+  row-gap: 1rem;
+  column-gap: 3rem;
+}

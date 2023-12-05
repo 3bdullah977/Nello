@@ -1,37 +1,56 @@
-import { useState } from "react";
-import reactLogo from "./assets/react.svg";
-import viteLogo from "/vite.svg";
-import { Button } from "@/components/ui/button";
-import "./global.css";
+import "./components/style/app/globals.css";
+// import Design from "./design";
+// import Prototip from "./prorotip";
+// import Test from "./test";
+// import Trello from "./trello";
+// import Finall from "./final";
+import { ThemeProvider } from "@/components/theme-provider";
+import "./components/style/app.scss";
+import Board from "./components/elemnts/home";
+import Nav from "./components/elemnts/nav";
+import BoardsList from "./components/elemnts/boards-list";
+// import { DemoCreateAccount } from "./components/elemnts/register-auth";
+import { DemoLoginAccount } from "./components/elemnts/login-auth";
+import { useDispatch, useSelector } from "react-redux";
+import { users } from "./components/actions/usersAction";
+import { getBoards } from "./components/actions/get-board-action";
+import { useEffect } from "react";
+import { Route, Routes, BrowserRouter } from "react-router-dom";
+import { columns } from "../src/components/actions/get-columns-action";
 
 function App() {
-  const [count, setCount] = useState(0);
+  // const design = Design();
+  // const prototipp = Prototip();
+  // const test = Test();
+  // const trello = Trello();
+  // const final = Finall();
+
+  // const card = design[0];
+  // console.log(card);
+
+  // const dispatch = useDispatch();
+  useEffect(() => {
+    // dispatch(columns());
+    // dispatch(getBoards());
+  }, []);
 
   return (
     <>
-      <div>
-        <a href="https://vitejs.dev" target="_blank">
-          <img src={viteLogo} className="logo" alt="Vite logo" />
-        </a>
-        <a href="https://react.dev" target="_blank">
-          <img src={reactLogo} className="logo react" alt="React logo" />
-        </a>
-      </div>
-      <h1>Vite + React</h1>
-      <div className="card">
-        <Button
-          variant={"default"}
-          onClick={() => setCount((count) => count + 1)}
-        >
-          count is {count}
-        </Button>
-        <p>
-          Edit <code>src/App.tsx</code> and save to test HMR
-        </p>
-      </div>
-      <p className="read-the-docs">
-        Click on the Vite and React logos to learn more
-      </p>
+      <ThemeProvider defaultTheme="dark" storageKey="vite-ui-theme">
+        <div className="app">
+          <BrowserRouter>
+            <Nav />
+            {/* <DemoCreateAccount /> */}
+            {/* <DemoLoginAccount /> */}
+            {/* <Switch> */}
+            <Routes>
+              <Route path="/" element={<BoardsList />} />
+              <Route path="/home" element={<Board />} />
+            </Routes>
+            {/* </Switch> */}
+          </BrowserRouter>
+        </div>
+      </ThemeProvider>
     </>
   );
 }
