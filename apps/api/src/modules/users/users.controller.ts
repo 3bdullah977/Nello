@@ -11,14 +11,20 @@ import {
   HttpCode,
   UseGuards,
   Req,
+  Put,
+  UploadedFile,
+  UseInterceptors,
 } from '@nestjs/common';
 import { UsersService } from './users.service';
 import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
-import { ApiBearerAuth, ApiTags } from '@nestjs/swagger';
+import { ApiBearerAuth, ApiConsumes, ApiTags } from '@nestjs/swagger';
 import { QueryUserDto } from './dto/query-user.dto';
 import { ok, res } from '@/utils/response-helper';
 import { AuthGuard } from '@nestjs/passport';
+import PersonalImageDto from './dto/upload-image.dto';
+import { imageFileFilter } from '@/utils/file-upload-util';
+import { FileInterceptor } from '../uploads/file-interceptor';
 
 @ApiTags('Users')
 @Controller({
@@ -88,6 +94,28 @@ export class UsersController {
     const updatedUser = await this.usersService.update(id, updateUserDto, req);
 
     return ok('Updated user successfully', updatedUser);
+  }
+
+  @ApiConsumes('multipart/form-data')
+  @ApiBearerAuth()
+  @UseGuards(AuthGuard('jwt'))
+  @Put('/uploadCover')
+  @UseInterceptors(
+    FileInterceptor('personalImage', { fileFilter: imageFileFilter }),
+  )
+  async uploadCover(
+    @Req() req: any,
+    @UploadedFile() file: Express.Multer.File,
+    @Body() _input: PersonalImageDto,
+  ) {
+    const updatedBoard = await this.usersService.putPersonalImage(
+      file,
+      req.user.sub,
+      req,
+    );
+    return ok('Personal image uploaded successfully', {
+      photoUrl: updatedBoard.imageUrl,
+    });
   }
 
   // @Delete(':id')

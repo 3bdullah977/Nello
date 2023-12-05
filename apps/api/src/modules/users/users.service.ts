@@ -107,7 +107,7 @@ export class UsersService {
 
   async putPersonalImage(file: Express.Multer.File, id: number, req: any) {
     const isSame = id === req.user.sub;
-    if (!isSame) throw new BadRequestException('You are not the creator');
+    if (!isSame) throw new BadRequestException('Wrong user');
     try {
       const uploadedFile = await this.cloudinaryService.uploadImage(
         file,
