@@ -12,6 +12,8 @@ import { UsersModule } from './modules/users/users.module';
 import { AuthModule } from './modules/auth/auth.module';
 import { UploadsModule } from './modules/uploads/uploads.module';
 import { CloudinaryModule } from './modules/cloudinary/cloudinary.module';
+import { DocumentsModule } from './modules/documents/documents.module';
+import { DrawingsModule } from './modules/drawings/drawings.module';
 
 @Module({
   imports: [
@@ -28,6 +30,8 @@ import { CloudinaryModule } from './modules/cloudinary/cloudinary.module';
     AuthModule,
     UploadsModule,
     CloudinaryModule,
+    DocumentsModule,
+    DrawingsModule,
   ],
   controllers: [AppController],
   providers: [AppService],

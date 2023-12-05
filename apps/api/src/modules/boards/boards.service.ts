@@ -11,9 +11,9 @@ import { CreateBoardDto } from './dto/create-board.dto';
 import { UpdateBoardDto } from './dto/update-board.dto';
 import { DB, DBType } from '@/modules/global/providers/db.provider';
 import { Board, board } from '@/_schemas/board';
-import { eq, and, or } from 'drizzle-orm';
+import { eq, and, sql, like } from 'drizzle-orm';
 import { CloudinaryService } from '../cloudinary/cloudinary.service';
-import { user, usersToBoards } from '@/_schemas/user';
+import { User, user, usersToBoards } from '@/_schemas/user';
 import { UsersService } from '../users/users.service';
 
 @Injectable()
@@ -36,34 +36,47 @@ export class BoardsService {
     }
   }
 
-  async findAll(page: number, limit: number, req: any) {
+  async findAll(page: number, limit: number, withMembers: boolean, req: any) {
     try {
       const currentUserId = req.user.sub;
       const offset = (page - 1) * limit;
-      const res1 = await this.db
-        .select()
-        .from(board)
-        .leftJoin(user, eq(board.creatorId, user.id))
-        .leftJoin(usersToBoards, eq(board.id, usersToBoards.boardId))
-        .where(
-          and(
-            eq(board.isPrivate, true),
-            or(
-              eq(usersToBoards.userId, currentUserId),
-              eq(board.creatorId, currentUserId),
-            ),
-          ),
-        )
-        .limit(limit)
-        .offset(offset);
-      const res2 = await this.db
-        .select()
-        .from(board)
-        .where(eq(board.isPrivate, false))
-        .limit(limit)
-        .offset(offset);
 
-      const result: Board[] = res1.map((item) => item.board).concat(res2);
+      type Res = { board: Board; members: User[] };
+
+      let result: Board[] | Res[];
+
+      if (withMembers) {
+        result = (await this.db.execute(
+          sql<{
+            board: Board;
+          }>`  select  distinct b.* 
+          from board b
+          left join users_to_boards utb 
+          on b.id = utb.board_id
+          left join public.user u
+          on utb.user_id = u.id
+          where (b.is_private = true) and (utb.user_id = ${currentUserId} or b.creator_id = ${currentUserId})
+          or b.is_private = false
+          limit ${limit} offset ${offset}`,
+        )) as Res[];
+        console.log(result);
+      } else {
+        result = (await this.db.execute(
+          sql<{
+            board: Board;
+          }>`  select  distinct b.* 
+          from board b
+          left join users_to_boards utb 
+          on b.id = utb.board_id
+          left join public.user u
+          on utb.user_id = u.id
+          where (b.is_private = true) and (utb.user_id = ${currentUserId} or b.creator_id = ${currentUserId})
+          or b.is_private = false
+          limit ${limit} offset ${offset}`,
+        )) as Board[];
+        console.log(result);
+      }
+
       return result;
     } catch (error) {
       throw new InternalServerErrorException(`Cannot find boards. ${error}`);
@@ -79,6 +92,18 @@ export class BoardsService {
     }
   }
 
+  async findByName(boardName: string) {
+    try {
+      const res = await this.db
+        .select()
+        .from(board)
+        .where(like(board.name, `${boardName}%`));
+      return res;
+    } catch (error) {
+      throw new InternalServerErrorException(`Cannot retrieve board. ${error}`);
+    }
+  }
+
   async update(id: number, updateBoardDto: UpdateBoardDto, req: any) {
     const foundBoard = await this.findOne(id);
     if (!foundBoard) throw new BadRequestException('Board not found');
@@ -88,7 +113,7 @@ export class BoardsService {
     try {
       const res = await this.db
         .update(board)
-        .set(updateBoardDto)
+        .set({ ...updateBoardDto, updatedAt: new Date() })
         .where(eq(board.id, id))
         .returning();
       return res[0];
@@ -166,9 +191,11 @@ export class BoardsService {
       throw new NotFoundException('Board does not exist');
     const boardMembers = await this.db
       .select()
-      .from(board)
-      .leftJoin(usersToBoards, eq(board.id, usersToBoards.boardId))
-      .leftJoin(user, eq(user.id, usersToBoards.userId));
+      .from(user)
+      .leftJoin(usersToBoards, eq(user.id, usersToBoards.userId))
+      .leftJoin(board, eq(board.id, usersToBoards.boardId))
+      .where(eq(board.id, boardId));
+
     const result = boardMembers.map((item) => item.user);
 
     const isCreator = await this.checkIfCreator(boardId, currentUserId);
@@ -187,22 +214,36 @@ export class BoardsService {
     userId: number,
     boardId: number,
   ) {
-    const isCreatorIdMatched = this.checkIfCreator(boardId, currentUserId);
-    if (!isCreatorIdMatched)
-      throw new UnauthorizedException('You are not the creator');
+    try {
+      const user = await this.usersService.findOne(userId);
+      if (!user) throw new BadRequestException('Could not find this user');
 
-    const user = await this.usersService.findOne(userId);
-    if (!user) throw new BadRequestException('User is not in this board');
+      const isCreatorIdMatched = this.checkIfCreator(boardId, currentUserId);
+      if (!isCreatorIdMatched)
+        throw new UnauthorizedException('You are not the creator');
+
+      if (userId === (await this.findOne(boardId)).creatorId)
+        throw new BadRequestException('Cannot remove the creator');
+
+      const isUserInBoard = await this.isInBoardMembers(userId, boardId);
+      if (isUserInBoard.length === 0)
+        throw new BadRequestException('User is not in this board');
+    } catch (e) {
+      throw e;
+    }
 
     try {
-      await this.db
-        .delete(usersToBoards)
-        .where(
-          and(
-            eq(usersToBoards.boardId, boardId),
-            eq(usersToBoards.userId, userId),
-          ),
-        );
+      console.log(
+        await this.db
+          .delete(usersToBoards)
+          .where(
+            and(
+              eq(usersToBoards.boardId, boardId),
+              eq(usersToBoards.userId, userId),
+            ),
+          )
+          .returning(),
+      );
     } catch (error) {
       throw new InternalServerErrorException(
         `Cannot remove user from board. ${error}`,
@@ -241,5 +282,18 @@ export class BoardsService {
     const thisBoard = await this.findOne(boardId);
     if (!thisBoard) throw new NotFoundException('Cannot find board');
     return thisBoard.creatorId === currentUserId;
+  }
+
+  private async isInBoardMembers(userId: number, boardId: number) {
+    const found = await this.db
+      .select()
+      .from(usersToBoards)
+      .where(
+        and(
+          eq(usersToBoards.userId, userId),
+          eq(usersToBoards.boardId, boardId),
+        ),
+      );
+    return found;
   }
 }
