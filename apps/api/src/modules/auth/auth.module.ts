@@ -8,9 +8,11 @@ import { ConfigModule, ConfigService } from '@nestjs/config';
 import { JWTConfig } from '@/config';
 import JWTStrategy from './strategies/jwt.strategy';
 import { UsersService } from '@/modules/users/users.service';
+import { CloudinaryModule } from '../cloudinary/cloudinary.module';
 
 @Module({
   imports: [
+    CloudinaryModule,
     UsersModule,
     ConfigModule.forRoot({
       load: [JWTConfig],

@@ -11,10 +11,14 @@ import { DB, DBType } from '@/modules/global/providers/db.provider';
 import { user } from '@/_schemas/user';
 import { eq, like } from 'drizzle-orm';
 import { hashPassword } from '@/utils/password';
+import { CloudinaryService } from '../cloudinary/cloudinary.service';
 
 @Injectable()
 export class UsersService {
-  constructor(@Inject(DB) private readonly db: DBType) {}
+  constructor(
+    @Inject(DB) private readonly db: DBType,
+    private readonly cloudinaryService: CloudinaryService,
+  ) {}
 
   async create(createUserDto: CreateUserDto) {
     try {
@@ -98,6 +102,27 @@ export class UsersService {
       return res[0];
     } catch (error) {
       throw new InternalServerErrorException(`Cannot remove user. ${error}`);
+    }
+  }
+
+  async putPersonalImage(file: Express.Multer.File, id: number, req: any) {
+    const isSame = id === req.user.sub;
+    if (!isSame) throw new BadRequestException('You are not the creator');
+    try {
+      const uploadedFile = await this.cloudinaryService.uploadImage(
+        file,
+        'users_image',
+      );
+      const updatedUser = await this.update(
+        id,
+        {
+          imageUrl: (uploadedFile as any).url,
+        },
+        req,
+      );
+      return updatedUser;
+    } catch (error) {
+      throw new BadRequestException(error);
     }
   }
 }

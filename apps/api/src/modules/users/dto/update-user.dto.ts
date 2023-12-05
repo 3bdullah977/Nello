@@ -7,15 +7,15 @@ export class UpdateUserDto extends PartialType(CreateUserDto) {
   @ApiProperty({ required: false })
   @IsAlphanumeric()
   @IsOptional()
-  username: string;
+  username?: string;
 
   @ApiProperty({ required: false })
   @IsAlphanumeric()
   @IsOptional()
-  password: string;
+  password?: string;
 
   @ApiProperty({ required: false })
   @IsAlphanumeric()
   @IsOptional()
-  imageUrl: string;
+  imageUrl?: string;
 }
