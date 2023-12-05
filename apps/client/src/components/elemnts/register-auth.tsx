@@ -33,8 +33,8 @@ type authData = {
 
 export function DemoCreateAccount() {
   const form = useForm();
-  const { register, handleSubmit, formState } = form;
-  const { errors }: authData = formState;
+  const { register, handleSubmit, formState }: any = form;
+  const { errors }: any = formState;
   console.log(errors);
 
   const onSubmit = async (data: authData) => {

@@ -25,10 +25,10 @@ import { useSelector } from "react-redux";
 // };
 
 function CreateCard() {
-  const [pic, setPic] = useState(null);
-  const [data, setData] = useState(null);
-  const [CardDescription, setCardDescription] = useState(null);
-  const [cardTitle, setCardTitle] = useState(null);
+  const [pic, setPic]: any = useState(null);
+  const [data, setData]: any = useState(null);
+  const [CardDescription, setCardDescription] = useState("");
+  const [cardTitle, setCardTitle] = useState("");
 
   const getData = async () => {
     const dataFetch = await axios.get(

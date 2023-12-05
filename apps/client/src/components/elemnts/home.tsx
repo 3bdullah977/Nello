@@ -150,11 +150,11 @@ function Board() {
   const { data } = useSelector(
     (state: {
       columns: {
-        columns: { data: Column[]; message: string; statusCode: number };
+        columns: { data: any; message: string; statusCode: number };
       };
     }) => state.columns.columns
   );
-  const dispatch = useDispatch();
+  const dispatch: any = useDispatch();
   const id = (id: number) => {
     dispatch(columnsID(id));
   };

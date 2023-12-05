@@ -23,9 +23,9 @@ import axios from "axios";
 // };
 
 function CreateBoardCard() {
-  const [pic, setPic] = useState(null);
-  const [data, setData] = useState(null);
-  const [CardDescription, setCardDescription] = useState(null);
+  const [pic, setPic] = useState("");
+  const [data, setData] = useState("");
+  const [CardDescription, setCardDescription] = useState("");
 
   const getData = async () => {
     const dataFetch = await axios.get(

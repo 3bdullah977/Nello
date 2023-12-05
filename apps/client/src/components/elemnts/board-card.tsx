@@ -17,10 +17,10 @@ import { Board } from "@/service/board";
 
 function BoardCard({ card }: { card: Board }) {
   // console.log(card);
-  const dispatch = useDispatch();
+  const dispatch: any = useDispatch();
   // useEffect(() => {
   // }, []);
-  const id = (e) => {
+  const id = (e: any) => {
     console.log(e.id);
     dispatch(boardsID(e.id));
     dispatch(columns(e.id));

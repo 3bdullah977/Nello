@@ -11,22 +11,22 @@ import axios from "axios";
 // import React from "react";
 // import { useNavigate } from "react-router-dom";
 
-type CreateCardProps = {
-  pic: string;
-  setPic: string;
-  data: string;
-  setData: string;
-};
-function SelectPic({ pic, setPic, data, setData }: CreateCardProps) {
+// type CreateCardProps = {
+//   pic: string;
+//   setPic: string;
+//   data: string;
+//   setData: string;
+// };
+function SelectPic({ pic, setPic, data, setData }: any) {
   // const history = useNavigate();
   // const final = Final();
   const [inputValue, setInputValue] = useState(null);
 
-  const click = (e) => {
+  const click = (e: any) => {
     setPic(e.target.src);
     // history();
   };
-  const searchInput = (e) => {
+  const searchInput = (e: any) => {
     setInputValue(e.target.value);
   };
   const sumbmitSearch = async () => {
@@ -68,7 +68,7 @@ function SelectPic({ pic, setPic, data, setData }: CreateCardProps) {
           <div className="pics flex gap-5 h-96 overflow-y-scroll">
             <ul className="gallery">
               {data &&
-                data.map((card: { src: { large: string } }) => (
+                data.map((card: any) => (
                   <li key={card.src}>
                     <img
                       className="rounded"

@@ -40,14 +40,14 @@ function BoardsList() {
   //   setBoards(resolve);
   // };
   // console.log(boards);
-  const dispatch = useDispatch();
+  const dispatch: any = useDispatch();
   useEffect(() => {
     dispatch(getBoards());
     // getBoard();
   }, []);
 
   const { data } = useSelector(
-    (state: { boards: { boards: { data: Board[] } } }) => state.boards.boards
+    (state: { boards: { boards: { data: any } } }) => state.boards.boards
   );
   return (
     <div className="boards-list">

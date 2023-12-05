@@ -15,8 +15,8 @@ import axios from "axios";
 
 export function DemoLoginAccount() {
   const form = useForm();
-  const { register, handleSubmit, formState } = form;
-  const { errors }: string = formState;
+  const { register, handleSubmit, formState }: any = form;
+  const { errors }: any = formState;
   console.log(errors);
 
   const onSubmit = async (data: { email: string; password: string }) => {

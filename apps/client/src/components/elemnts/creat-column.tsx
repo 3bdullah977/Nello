@@ -10,7 +10,7 @@ import { useSelector } from "react-redux";
 // };
 
 function CreateColumn() {
-  const [CardDescription, setCardDescription] = useState(null);
+  const [CardDescription, setCardDescription] = useState("");
   const { boards_id } = useSelector(
     (state: { id: { boards_id: number } }) => state.id
   );
