@@ -107,7 +107,8 @@ export class BoardsService {
   async update(id: number, updateBoardDto: UpdateBoardDto, req: any) {
     const foundBoard = await this.findOne(id);
     if (!foundBoard) throw new BadRequestException('Board not found');
-    const isSameId = req.user.sub === board.creatorId;
+    const isSameId = req.user.sub === foundBoard.creatorId;
+    console.log(isSameId);
     if (!isSameId)
       throw new UnprocessableEntityException('You are not the creator');
     try {
@@ -136,7 +137,8 @@ export class BoardsService {
   }
 
   async putCoverImage(file: Express.Multer.File, id: number, req: any) {
-    const isCreator = await this.checkIfCreator(id, req.sub.id);
+    const isCreator = await this.checkIfCreator(id, req.user.sub);
+    console.log(!isCreator);
     if (!isCreator) throw new BadRequestException('You are not the creator');
     try {
       const uploadedFile = await this.cloudinaryService.uploadImage(

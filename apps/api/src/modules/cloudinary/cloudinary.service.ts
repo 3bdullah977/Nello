@@ -5,7 +5,7 @@ import { cloudinary } from './cloudinary';
 export class CloudinaryService {
   async uploadImage(
     file: Express.Multer.File,
-    folderName: 'boards_cover' | 'cards_cover',
+    folderName: 'boards_cover' | 'cards_cover' | 'users_image',
   ): Promise<object> {
     console.log(cloudinary.config.call(this));
     if (file.size > 10000000) throw new BadRequestException('Image size limit');
