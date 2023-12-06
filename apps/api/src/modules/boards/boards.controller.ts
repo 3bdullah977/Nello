@@ -154,7 +154,7 @@ export class BoardsController {
     return ok('Members found successfully', members);
   }
 
-  @Delete('/:boardId/removeUserFromBoard')
+  @Put('/:boardId/removeUserFromBoard')
   async removeUserFromBoard(
     @Req() req,
     @Body() input: AddUserBoardDto,
