@@ -7,7 +7,7 @@ import { CreateColumnDto } from './dto/create-column.dto';
 import { UpdateColumnDto } from './dto/update-column.dto';
 import { DB, DBType } from '../global/providers/db.provider';
 import { column } from '@/_schemas/column';
-import { eq } from 'drizzle-orm';
+import { eq, sql } from 'drizzle-orm';
 
 @Injectable()
 export class ColumnsService {
@@ -15,9 +15,14 @@ export class ColumnsService {
 
   async create(createColumnDto: CreateColumnDto, boardId: number) {
     try {
+      const colCount = await this.db
+        .select({ count: sql<number>`count(*)` })
+        .from(column)
+        .where(eq(column.boardId, boardId));
+      console.log(colCount);
       const newColumn = await this.db
         .insert(column)
-        .values({ ...createColumnDto, boardId })
+        .values({ ...createColumnDto, position: ++colCount[0].count, boardId })
         .returning();
 
       return newColumn[0];
