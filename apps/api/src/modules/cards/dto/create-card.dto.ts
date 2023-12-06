@@ -1,11 +1,5 @@
 import { ApiProperty } from '@nestjs/swagger';
-import {
-  IsAlphanumeric,
-  IsNotEmpty,
-  MinLength,
-  MaxLength,
-  IsString,
-} from 'class-validator';
+import { IsNotEmpty, MinLength, MaxLength, IsString } from 'class-validator';
 
 export class CreateCardDto {
   @ApiProperty()
@@ -21,7 +15,7 @@ export class CreateCardDto {
   description: string;
 
   @ApiProperty()
-  @IsAlphanumeric()
+  @IsString()
   @IsNotEmpty()
   coverImage: string;
 }
