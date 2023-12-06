@@ -7,7 +7,6 @@ import {
   Param,
   Delete,
   HttpCode,
-  Query,
   ParseIntPipe,
   HttpStatus,
   UseGuards,
@@ -16,7 +15,6 @@ import { ColumnsService } from './columns.service';
 import { CreateColumnDto } from './dto/create-column.dto';
 import { UpdateColumnDto } from './dto/update-column.dto';
 import { ok, res } from '@/utils/response-helper';
-import { QueryColumnDto } from './dto/query-column.dto';
 import { ApiBearerAuth, ApiTags } from '@nestjs/swagger';
 import LocalAuthGuard from '../auth/guards/jwt.guard';
 
@@ -39,16 +37,8 @@ export class ColumnsController {
   }
 
   @Get()
-  async findAll(
-    @Query() query: QueryColumnDto,
-    @Param('boardId', ParseIntPipe) boardId: number,
-  ) {
-    const page = query.page ?? 1;
-    let limit = query.limit ?? 10;
-    if (limit > 50) {
-      limit = 50;
-    }
-    const columns = await this.columnsService.findAll(page, limit, boardId);
+  async findAll(@Param('boardId', ParseIntPipe) boardId: number) {
+    const columns = await this.columnsService.findAll(boardId);
     return ok('Found columns successfully', columns);
   }
 

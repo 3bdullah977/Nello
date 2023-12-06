@@ -31,15 +31,12 @@ export class ColumnsService {
     }
   }
 
-  async findAll(page: number, limit: number, boardId: number) {
+  async findAll(boardId: number) {
     try {
-      const offset = (page - 1) * limit;
       const columns = await this.db
         .select()
         .from(column)
-        .where(eq(column.boardId, boardId))
-        .limit(limit)
-        .offset(offset);
+        .where(eq(column.boardId, boardId));
 
       return columns;
     } catch (error) {
