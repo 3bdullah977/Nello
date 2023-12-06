@@ -14,44 +14,30 @@ import { useEffect } from "react";
 import { useSelector, useDispatch } from "react-redux";
 import { getBoards } from "../actions/get-board-action";
 import { Board } from "@/service/board";
+import { useNavigate } from "react-router-dom";
+import { useLocalStorage } from "usehooks-ts";
 
 function BoardsList() {
-  // const [board, setBoards] = useState(null);
-
-  // const getBoard = async () => {
-  //   let token;
-  //   if (sessionStorage.getItem("token") === null) {
-  //     token = [];
-  //   } else {
-  //     token = JSON.parse(sessionStorage.getItem("token"));
-  //   }
-  //   const dataFetch = await axios.get(
-  //     "http://localhost:3001/api/v1/boards?page=1&limit=15",
-  //     {
-  //       method: "GET",
-  //       headers: {
-  //         Accept: "application/json",
-  //         Authorization: `Bearer ${token}`,
-  //       },
-  //     }
-  //   );
-  //   const resolve = await dataFetch.data.data;
-  //   // console.log(resolve);
-  //   setBoards(resolve);
-  // };
-  // console.log(boards);
+  const [token] = useLocalStorage("token", "");
+  const navigate = useNavigate();
   const dispatch: any = useDispatch();
+
   useEffect(() => {
-    dispatch(getBoards());
-    // getBoard();
-  }, []);
+    console.log(token);
+    if (!token) navigate("/login");
+  }, [token, navigate]);
+
+  useEffect(() => {
+    dispatch(getBoards(token));
+  }, [token, dispatch]);
 
   const { data } = useSelector(
     (state: { boards: { boards: { data: any } } }) => state.boards.boards
   );
   return (
     <div className="boards-list">
-      {data && data.data.map((card: Board) => <BoardCard card={card} />)}
+      {data &&
+        data.data.map((card: Board) => <BoardCard key={card.id} card={card} />)}
 
       <Dialog>
         <DialogTrigger>

@@ -9,7 +9,7 @@ import {
 
 export class CreateCardDto {
   @ApiProperty()
-  @IsAlphanumeric()
+  @IsString()
   @IsNotEmpty()
   @MinLength(3)
   @MaxLength(100)

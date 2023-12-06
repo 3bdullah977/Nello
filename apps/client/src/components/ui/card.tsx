@@ -13,7 +13,7 @@ const Card = React.forwardRef<
       className
     )}
     {...props}
-  />
+  ></div>
 ));
 Card.displayName = "Card";
 

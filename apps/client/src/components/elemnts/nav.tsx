@@ -2,8 +2,13 @@ import { Input } from "@/components/ui/input";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { ModeToggle } from "../mode-toggle";
 import { Search } from "lucide-react";
+import { userAtom } from "@/atoms/user";
+import { useAtom } from "jotai";
+import { useLocalStorage } from "usehooks-ts";
+import { User } from "@/service/user";
 
 function Nav() {
+  const [user] = useLocalStorage("user", {} as User);
   return (
     <>
       <div className="nav flex justify-between p-8 pt-3 pb-3 shadow border-b">
@@ -22,8 +27,8 @@ function Nav() {
         <div className="right flex flex-wrap gap-5 items-center">
           <ModeToggle />
           <Avatar className="w-9 h-9">
-            <AvatarImage src="https://github.com/shadcn.png" />
-            <AvatarFallback>CN</AvatarFallback>
+            <AvatarImage src={user.imageUrl} />
+            <AvatarFallback>{user.username}</AvatarFallback>
           </Avatar>
         </div>
       </div>

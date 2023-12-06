@@ -20,14 +20,14 @@ import SelectPic from "./select-pic";
 import { useState } from "react";
 import axios from "axios";
 import { useSelector } from "react-redux";
-// type CreateCardProps = {
-//   columnValue: string;
-// };
+import { useLocalStorage } from "usehooks-ts";
+import { createCard } from "@/service/card";
+import { useParams } from "react-router-dom";
 
-function CreateCard() {
+function CreateCard({ columnId }: { columnId: number }) {
   const [pic, setPic]: any = useState(null);
   const [data, setData]: any = useState(null);
-  const [CardDescription, setCardDescription] = useState("");
+  const [cardDescription, setCardDescription] = useState("");
   const [cardTitle, setCardTitle] = useState("");
 
   const getData = async () => {
@@ -44,49 +44,22 @@ function CreateCard() {
     );
     setData(dataFetch.data.photos);
   };
-  const { columns_id } = useSelector(
-    (state: { id: { columns_id: number } }) => state.id
-  );
-  const { boards_id } = useSelector(
-    (state: { id: { boards_id: number } }) => state.id
-  );
+  const { boardId } = useParams();
+  const [token] = useLocalStorage("token", "");
   const createColumnCard = async () => {
-    let token;
-    if (sessionStorage.getItem("token") === null) {
-      token = [];
-    } else {
-      token = JSON.parse(sessionStorage.getItem("token") ?? "");
-    }
-    const data = await axios.post(
-      `http://localhost:3001/api/v1/boards/${boards_id}/columns/${columns_id}/cards`,
+    const data = createCard(
       {
+        coverImage: "",
+        description: cardDescription,
         title: cardTitle,
-        description: CardDescription,
-        coverImage: "g",
       },
-      {
-        headers: {
-          Accept: "application/json",
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${token}`,
-        },
-      }
+      parseInt(boardId!),
+      columnId,
+      token
     );
     const resolve = await data.data;
     console.log(resolve);
   };
-
-  // const saveLocal = (cover: any) => {
-  //   let items;
-  //   if (localStorage.getItem(`${columnValue}`) === null) {
-  //     items = [];
-  //   } else {
-  //     items = JSON.parse(localStorage.getItem(`${columnValue}`));
-  //   }
-  //   items.push({ cover, CardDescription });
-  //   localStorage.setItem(`${columnValue}`, JSON.stringify(items));
-  // };
-  // localStorage.clear();
 
   return (
     <div className="create-card">
@@ -149,7 +122,8 @@ function CreateCard() {
             onClick={() => {
               // saveLocal(pic);
               createColumnCard();
-            }}>
+            }}
+          >
             <Plus className="pr-2" />
             Create
           </Button>

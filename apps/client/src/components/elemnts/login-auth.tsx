@@ -10,17 +10,24 @@ import {
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { useForm } from "react-hook-form";
-// import { useState } from "react";
 import axios from "axios";
+import { useNavigate } from "react-router-dom";
+import { LoginUser } from "@/service/auth";
+import { useLocalStorage } from "usehooks-ts";
+import { userAtom } from "@/atoms/user";
+import { useAtom } from "jotai";
+import { User } from "@/service/user";
 
 export function DemoLoginAccount() {
-  const form = useForm();
-  const { register, handleSubmit, formState }: any = form;
-  const { errors }: any = formState;
-  console.log(errors);
+  const form = useForm<LoginUser>();
+  const { register, handleSubmit, formState, getValues } = form;
+  const { errors } = formState;
+  const [token, setToken] = useLocalStorage("token", "");
+  const [, setLocalUser] = useLocalStorage("user", {} as User);
+  const [, setUserLogin] = useAtom(userAtom);
+  const navigate = useNavigate();
 
   const onSubmit = async (data: { email: string; password: string }) => {
-    console.log(data);
     const postData = await axios.post(
       "http://localhost:3001/api/v1/auth/login",
       {
@@ -28,20 +35,16 @@ export function DemoLoginAccount() {
         password: data.password,
       }
     );
-    const resopnse = await postData.data;
-    let token;
-    if (sessionStorage.getItem("token") === null) {
-      token = [];
-    } else {
-      token = JSON.parse(sessionStorage.getItem("token") ?? "");
-    }
-    token.push(resopnse.data.token);
-    sessionStorage.setItem("token", JSON.stringify(token));
-    // localStorage.clear();
+    const response = await postData.data;
+    setToken(response.data.token);
+    console.log(token);
+    setUserLogin(response.data.user as User);
+    setLocalUser(response.data.user as User);
+    navigate("/boards");
   };
 
   return (
-    <form onSubmit={handleSubmit(onSubmit)} noValidate>
+    <form onSubmit={handleSubmit(() => onSubmit(getValues()))} noValidate>
       <Card>
         <CardHeader className="space-y-1">
           <CardTitle className="text-2xl">Login</CardTitle>
@@ -57,7 +60,7 @@ export function DemoLoginAccount() {
                 pattern: {
                   value:
                     /^[a-zA-Z0-9.!#$%&'*+/=?^_^{1}~-]+@[a-zA-Z0-9-]+(?:\.[a-zA-Z0-9-]+)*$/,
-                  message: "invaild email address",
+                  message: "invalid email address",
                 },
                 required: "email is required",
               })}

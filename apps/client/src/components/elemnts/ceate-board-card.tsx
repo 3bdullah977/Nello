@@ -6,7 +6,7 @@ import {
 } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
-import { Image, Globe2, Plus } from "lucide-react";
+import { Image, Globe2, Plus, Lock } from "lucide-react";
 import {
   Dialog,
   DialogContent,
@@ -18,6 +18,10 @@ import {
 import SelectPic from "./select-pic";
 import { useState } from "react";
 import axios from "axios";
+import { useMutation } from "@tanstack/react-query";
+import { createBoard } from "@/service/board";
+import { useLocalStorage } from "usehooks-ts";
+import { User } from "@/service/user";
 // type CreateCardProps = {
 //   columnValue: string;
 // };
@@ -25,7 +29,24 @@ import axios from "axios";
 function CreateBoardCard() {
   const [pic, setPic] = useState("");
   const [data, setData] = useState("");
-  const [CardDescription, setCardDescription] = useState("");
+  const [isPrivate, setIsPrivate] = useState(false);
+  const [title, setTitle] = useState("");
+  const [token] = useLocalStorage("token", "");
+  const [user] = useLocalStorage("user", {} as User);
+
+  const { mutate, data: mutateData } = useMutation({
+    mutationKey: ["createBoard"],
+    mutationFn: () =>
+      createBoard(
+        {
+          creatorId: user.id,
+          imageUrl: pic,
+          isPrivate,
+          name: title,
+        },
+        token
+      ),
+  });
 
   const getData = async () => {
     const dataFetch = await axios.get(
@@ -43,43 +64,9 @@ function CreateBoardCard() {
   };
 
   const createBoardCard = async () => {
-    let token;
-    if (sessionStorage.getItem("token") === null) {
-      token = [];
-    } else {
-      token = JSON.parse(sessionStorage.getItem("token") ?? "");
-    }
-    console.log(token);
-    const data = await axios.post(
-      "http://localhost:3001/api/v1/boards",
-      {
-        name: CardDescription,
-        imageUrl: pic,
-        creatorId: 1,
-        isPrivate: true,
-      },
-      {
-        headers: {
-          Accept: "application/json",
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${token}`,
-        },
-      }
-    );
-    const resolve = await data.data;
-    console.log(resolve);
+    mutate();
+    console.log(mutateData?.data);
   };
-
-  // const saveLocal = (cover: any) => {
-  //   let items;
-  //   if (localStorage.getItem(`${columnValue}`) === null) {
-  //     items = [];
-  //   } else {
-  //     items = JSON.parse(localStorage.getItem(`${columnValue}`));
-  //   }
-  //   items.push({ cover, CardDescription });
-  //   localStorage.setItem(`${columnValue}`, JSON.stringify(items));
-  // };
 
   return (
     <div className="create-card">
@@ -93,7 +80,7 @@ function CreateBoardCard() {
               className="border  p-5 border-solid border-zinc-400"
               placeholder="Add border title"
               onChange={(e) => {
-                setCardDescription(e.target.value);
+                setTitle(e.target.value);
               }}
             />
           </div>
@@ -117,9 +104,22 @@ function CreateBoardCard() {
                 </DialogContent>
               </Dialog>
             </Button>
-            <Button variant="outline" className="w-full  p-5">
-              <Globe2 className="pr-2" />
-              Public
+            <Button
+              variant="outline"
+              className="w-full  p-5"
+              onClick={() => setIsPrivate((prev) => !prev)}
+            >
+              {!isPrivate ? (
+                <>
+                  <Globe2 className="pr-2" />
+                  Public
+                </>
+              ) : (
+                <>
+                  <Lock className="pr-2" />
+                  Private
+                </>
+              )}
             </Button>
           </div>
         </CardContent>
@@ -130,7 +130,8 @@ function CreateBoardCard() {
           <Button
             variant="outline"
             className="bg-zinc-400 p-5 text-white"
-            onClick={createBoardCard}>
+            onClick={createBoardCard}
+          >
             <Plus className="pr-2" />
             Create
           </Button>

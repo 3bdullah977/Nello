@@ -1,40 +1,124 @@
 import axios from "axios";
-import { authToken, baseUrl } from "./base";
+import { baseUrl } from "./base";
+import { User } from "./user";
 
 export type Board = {
-    id: number;
-    name: string;
-    createdAt: string;
-    updatedAt: string
-    imageUrl: string;
-    creatorId: number;
-    isPrivate: boolean;
-}
+  id: number;
+  name: string;
+  createdAt: string;
+  updatedAt: string;
+  imageUrl: string;
+  creatorId: number;
+  isPrivate: boolean;
+};
 
 export type AddBoard = {
-    name: string;
-    imageUrl: string;
-    creatorId: number;
-    isPrivate: boolean;
-}
+  name: string;
+  imageUrl: string;
+  creatorId: number;
+  isPrivate: boolean;
+};
 
-export const getBoards = async (page: number = 1, limit: number = 10) => {
-    const url = `${baseUrl}/boards?page=${page}&limit=${limit}`
-    
-    const data = await axios.get(url, {headers: {Authorization: authToken}})
-    return data
-}
+export const getBoards = async (token: string) => {
+  const url = `${baseUrl}/boards?`;
 
-export const getBoardById = async (id: number) => {
-    const url = `${baseUrl}/boards/${id}`
-    
-    const data = await axios.get(url, {headers: {Authorization: authToken}})
-    return data
-}
+  const data = await axios.get<{ data: Board[] }>(url, {
+    headers: { Authorization: `Bearer ${token}` },
+  });
+  return data;
+};
 
-export const createBoard =async (input:AddBoard) => {
-    const url = `${baseUrl}/boards`
-    
-    const data = await axios.post(url, input, {headers: {Authorization: authToken}})
-    return data
-}
+export const getBoardById = async (id: number, token: string) => {
+  const url = `${baseUrl}/boards/${id}`;
+
+  const data = await axios.get<{ data: Board }>(url, {
+    headers: { Authorization: `Bearer ${token}` },
+  });
+  return data;
+};
+
+export const getBoardByName = async (name: string, token: string) => {
+  const url = `${baseUrl}/boards/${name}/getByName`;
+
+  const data = await axios.get<{ data: Board }>(url, {
+    headers: { Authorization: `Bearer ${token}` },
+  });
+  return data;
+};
+
+export const createBoard = async (input: AddBoard, token: string) => {
+  const url = `${baseUrl}/boards`;
+
+  const data = await axios.post(url, input, {
+    headers: { Authorization: `Bearer ${token}` },
+  });
+  return data;
+};
+
+export const listBoardMembers = async (id: number, token: string) => {
+  const url = `${baseUrl}/boards/${id}/listBoardMembers`;
+
+  const data = await axios.get<{ data: User[] }>(url, {
+    headers: { Authorization: `Bearer ${token}` },
+  });
+  return data;
+};
+
+export const addUserToBoard = async (
+  id: number,
+  userId: number,
+  token: string
+) => {
+  const url = `${baseUrl}/boards/${id}/addUserToBoard`;
+
+  const data = await axios.put(
+    url,
+    { userId },
+    {
+      headers: { Authorization: `Bearer ${token}` },
+    }
+  );
+  return data;
+};
+
+export const removeUserFromBoard = async (
+  id: number,
+  userId: number,
+  token: string
+) => {
+  const url = `${baseUrl}/boards/${id}/removeUserFromBoard`;
+
+  const data = await axios.put(
+    url,
+    { userId },
+    {
+      headers: { Authorization: `Bearer ${token}` },
+    }
+  );
+  return data;
+};
+
+export const toggleBoardVisibility = async (id: number, token: string) => {
+  const url = `${baseUrl}/boards/${id}/toggleVisibility`;
+  console.log(token);
+
+  await axios.put(url, {
+    headers: { Authorization: `Bearer ${token}` },
+  });
+};
+
+export const uploadBoardCover = async (
+  id: number,
+  boardCover: File,
+  token: string
+) => {
+  const url = `${baseUrl}/boards/${id}/uploadCover`;
+
+  await axios.put(
+    url,
+    { boardCover },
+    {
+      headers: { Authorization: `Bearer ${token}` },
+    }
+  );
+};
