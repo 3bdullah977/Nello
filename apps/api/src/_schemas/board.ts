@@ -7,7 +7,7 @@ export const board = pgTable('board', {
   id: serial('id').primaryKey(),
   name: varchar('name', { length: 100 }).notNull(),
   creatorId: serial('creator_id')
-    .references(() => user.id)
+    .references(() => user.id, { onDelete: 'cascade', onUpdate: 'cascade' })
     .notNull(),
   isPrivate: boolean('is_private').notNull().default(false),
   imageUrl: text('image_url'),

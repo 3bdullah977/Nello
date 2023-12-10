@@ -20,10 +20,10 @@ export const userRelations = relations(user, ({ many }) => ({
 export const usersToBoards = pgTable('users_to_boards', {
   userId: serial('user_id')
     .notNull()
-    .references(() => user.id),
+    .references(() => user.id, { onDelete: 'cascade', onUpdate: 'cascade' }),
   boardId: serial('board_id')
     .notNull()
-    .references(() => board.id),
+    .references(() => board.id, { onDelete: 'cascade', onUpdate: 'cascade' }),
 });
 
 export const usersToBoardsRelations = relations(usersToBoards, ({ one }) => ({

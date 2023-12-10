@@ -10,10 +10,10 @@ export const label = pgTable('label', {
   color: varchar('color', { length: 20 }).notNull(),
   cardId: serial('card_id')
     .notNull()
-    .references(() => card.id),
+    .references(() => card.id, { onDelete: 'cascade', onUpdate: 'cascade' }),
   boardId: serial('board_id')
     .notNull()
-    .references(() => board.id),
+    .references(() => board.id, { onUpdate: 'cascade', onDelete: 'cascade' }),
   createdAt: timestamp('created_at').$defaultFn(() => new Date()),
   updatedAt: timestamp('updated_at').$defaultFn(() => new Date()),
 });

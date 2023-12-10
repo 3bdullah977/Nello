@@ -6,12 +6,14 @@ import { board } from './board';
 export const document = pgTable('document', {
   id: serial('id').primaryKey(),
   content: text('content').notNull(),
-  creatorId: serial('creator_id')
-    .notNull()
-    .references(() => user.id),
-  boardId: serial('board_id')
-    .notNull()
-    .references(() => board.id),
+  creatorId: serial('creator_id').references(() => user.id, {
+    onDelete: 'cascade',
+    onUpdate: 'cascade',
+  }),
+  boardId: serial('board_id').references(() => board.id, {
+    onDelete: 'cascade',
+    onUpdate: 'cascade',
+  }),
   createdAt: timestamp('created_at').$defaultFn(() => new Date()),
   updatedAt: timestamp('updated_at').$defaultFn(() => new Date()),
 });

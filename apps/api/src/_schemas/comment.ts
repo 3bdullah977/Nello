@@ -9,10 +9,11 @@ export const comment = pgTable('comment', {
   content: text('content').notNull(),
   userId: serial('user_id')
     .notNull()
-    .references(() => user.id),
-  cardId: serial('card_id')
-    .notNull()
-    .references(() => card.id),
+    .references(() => user.id, { onDelete: 'cascade', onUpdate: 'cascade' }),
+  cardId: serial('card_id').references(() => card.id, {
+    onDelete: 'cascade',
+    onUpdate: 'cascade',
+  }),
   createdAt: timestamp('created_at').$defaultFn(() => new Date()),
   updatedAt: timestamp('updated_at').$defaultFn(() => new Date()),
 });

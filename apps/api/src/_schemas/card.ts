@@ -7,9 +7,10 @@ export const card = pgTable('card', {
   title: varchar('name', { length: 100 }).notNull(),
   description: text('description'),
   coverImage: varchar('cover_image'),
-  columnId: serial('column_id')
-    .notNull()
-    .references(() => column.id),
+  columnId: serial('column_id').references(() => column.id, {
+    onDelete: 'cascade',
+    onUpdate: 'cascade',
+  }),
   createdAt: timestamp('created_at').$defaultFn(() => new Date()),
   updatedAt: timestamp('updated_at').$defaultFn(() => new Date()),
 });

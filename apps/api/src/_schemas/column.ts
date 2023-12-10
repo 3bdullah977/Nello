@@ -12,9 +12,10 @@ export const column = pgTable('column', {
   id: serial('id').primaryKey(),
   name: varchar('name', { length: 100 }).notNull(),
   position: integer('position').notNull(),
-  boardId: serial('board_id')
-    .references(() => board.id)
-    .notNull(),
+  boardId: serial('board_id').references(() => board.id, {
+    onDelete: 'cascade',
+    onUpdate: 'cascade',
+  }),
   createdAt: timestamp('created_at').$defaultFn(() => new Date()),
   updatedAt: timestamp('updated_at').$defaultFn(() => new Date()),
 });
