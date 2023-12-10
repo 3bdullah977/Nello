@@ -16,11 +16,15 @@ import { usersToBoards } from '@/_schemas/user';
 @Injectable()
 export class DocumentsService {
   constructor(@Inject(DB) private readonly db: DBType) {}
-  async create(createDocumentDto: CreateDocumentDto, boardId: number) {
+  async create(
+    req: any,
+    createDocumentDto: CreateDocumentDto,
+    boardId: number,
+  ) {
     try {
       const newCard = await this.db
         .insert(document)
-        .values({ ...createDocumentDto, boardId })
+        .values({ ...createDocumentDto, boardId, creatorId: req.user.sub })
         .returning();
 
       return newCard[0];

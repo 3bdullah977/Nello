@@ -32,11 +32,13 @@ export class DocumentsController {
   @Post()
   @HttpCode(201)
   async create(
+    @Req() req: any,
     @Body() createDocumentDto: CreateDocumentDto,
     @Param('boardId', ParseIntPipe) boardId: number,
   ) {
     if (!createDocumentDto) throw new BadRequestException('Invalid Input');
     const document = await this.documentsService.create(
+      req,
       createDocumentDto,
       boardId,
     );
