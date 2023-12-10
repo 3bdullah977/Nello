@@ -58,7 +58,7 @@ export class BoardsService {
           where (b.is_private = true) and (utb.user_id = ${currentUserId} or b.creator_id = ${currentUserId})
           or b.is_private = false
           limit ${limit} offset ${offset}`,
-        )) as Res[];
+        )) as Board[];
         console.log(result);
       } else {
         result = (await this.db.execute(
@@ -77,6 +77,16 @@ export class BoardsService {
         console.log(result);
       }
 
+      result.forEach((a) => {
+        Object.keys(a).forEach((k) => {
+          console.log(a);
+          const newK = k.replace(/(\_\w)/g, (m) => m[1].toUpperCase());
+          if (newK != k) {
+            a[newK] = a[k];
+            delete a[k];
+          }
+        });
+      });
       return result;
     } catch (error) {
       throw new InternalServerErrorException(`Cannot find boards. ${error}`);

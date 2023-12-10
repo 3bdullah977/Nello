@@ -142,7 +142,7 @@ export class BoardsController {
     });
   }
 
-  @Get('/:boardId/listBoardMemebers')
+  @Get('/:boardId/listBoardMembers')
   async listBoardMembers(
     @Req() req: any,
     @Param('boardId', ParseIntPipe) boardId: number,
