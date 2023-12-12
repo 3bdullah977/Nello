@@ -1,5 +1,11 @@
 import { ApiProperty } from '@nestjs/swagger';
-import { IsString, IsNotEmpty, IsNumber } from 'class-validator';
+import {
+  IsString,
+  IsNotEmpty,
+  IsNumber,
+  MinLength,
+  MaxLength,
+} from 'class-validator';
 
 export class CreateDrawingDto {
   @ApiProperty()
@@ -10,5 +16,7 @@ export class CreateDrawingDto {
   @ApiProperty()
   @IsNumber()
   @IsNotEmpty()
-  creatorId: number;
+  @MinLength(2)
+  @MaxLength(100)
+  name: string;
 }
