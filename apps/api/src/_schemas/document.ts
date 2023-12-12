@@ -6,7 +6,7 @@ import { board } from './board';
 export const document = pgTable('document', {
   id: serial('id').primaryKey(),
   name: varchar('name', { length: 100 }).notNull(),
-  content: text('content').notNull(),
+  content: text('content'),
   creatorId: serial('creator_id').references(() => user.id, {
     onDelete: 'cascade',
     onUpdate: 'cascade',
