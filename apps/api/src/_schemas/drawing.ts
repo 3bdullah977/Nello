@@ -1,10 +1,11 @@
-import { pgTable, serial, text, timestamp } from 'drizzle-orm/pg-core';
+import { pgTable, serial, text, timestamp, varchar } from 'drizzle-orm/pg-core';
 import { user } from './user';
 import { InferInsertModel, InferSelectModel } from 'drizzle-orm';
 import { board } from './board';
 
 export const drawing = pgTable('drawing', {
   id: serial('id').primaryKey(),
+  name: varchar('name', { length: 100 }).notNull(),
   content: text('content').notNull(),
   creatorId: serial('creator_id').references(() => user.id, {
     onDelete: 'cascade',
