@@ -48,7 +48,6 @@ export class UsersController {
   @ApiBearerAuth()
   @UseGuards(AuthGuard('jwt'))
   async findAll(@Req() req, @Query() query: QueryUserDto) {
-    console.log(req);
     const page = query?.page ?? 1;
     let limit = query?.limit ?? 10;
     if (limit > 50) {

@@ -11,7 +11,6 @@ export const CloudinaryProvider: FactoryProvider = {
   provide: CLOUDINARY,
   inject: [CloudinaryConfig.KEY],
   useFactory: (cloudinaryConfig: ConfigType<typeof CloudinaryConfig>) => {
-    console.log('config', cloudinaryConfig);
     return cloudinary.config(cloudinaryConfig);
   },
 };

@@ -59,7 +59,6 @@ export class BoardsService {
           or b.is_private = false
           limit ${limit} offset ${offset}`,
         )) as Board[];
-        console.log(result);
       } else {
         result = (await this.db.execute(
           sql<{
@@ -74,12 +73,10 @@ export class BoardsService {
           or b.is_private = false
           limit ${limit} offset ${offset}`,
         )) as Board[];
-        console.log(result);
       }
 
       result.forEach((a) => {
         Object.keys(a).forEach((k) => {
-          console.log(a);
           const newK = k.replace(/(\_\w)/g, (m) => m[1].toUpperCase());
           if (newK != k) {
             a[newK] = a[k];
@@ -118,7 +115,6 @@ export class BoardsService {
     const foundBoard = await this.findOne(id);
     if (!foundBoard) throw new BadRequestException('Board not found');
     const isSameId = req.user.sub === foundBoard.creatorId;
-    console.log(isSameId);
     if (!isSameId)
       throw new UnprocessableEntityException('You are not the creator');
     try {
@@ -148,7 +144,6 @@ export class BoardsService {
 
   async putCoverImage(file: Express.Multer.File, id: number, req: any) {
     const isCreator = await this.checkIfCreator(id, req.user.sub);
-    console.log(!isCreator);
     if (!isCreator) throw new BadRequestException('You are not the creator');
     try {
       const uploadedFile = await this.cloudinaryService.uploadImage(
@@ -245,17 +240,15 @@ export class BoardsService {
     }
 
     try {
-      console.log(
-        await this.db
-          .delete(usersToBoards)
-          .where(
-            and(
-              eq(usersToBoards.boardId, boardId),
-              eq(usersToBoards.userId, userId),
-            ),
-          )
-          .returning(),
-      );
+      await this.db
+        .delete(usersToBoards)
+        .where(
+          and(
+            eq(usersToBoards.boardId, boardId),
+            eq(usersToBoards.userId, userId),
+          ),
+        )
+        .returning();
     } catch (error) {
       throw new InternalServerErrorException(
         `Cannot remove user from board. ${error}`,

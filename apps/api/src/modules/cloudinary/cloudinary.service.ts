@@ -7,7 +7,7 @@ export class CloudinaryService {
     file: Express.Multer.File,
     folderName: 'boards_cover' | 'cards_cover' | 'users_image',
   ): Promise<object> {
-    console.log(cloudinary.config.call(this));
+    cloudinary.config.call(this);
     if (file.size > 10000000) throw new BadRequestException('Image size limit');
 
     if (!file.mimetype.startsWith('image'))

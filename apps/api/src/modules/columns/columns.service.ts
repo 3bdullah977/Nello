@@ -19,7 +19,6 @@ export class ColumnsService {
         .select({ count: sql<number>`count(*)` })
         .from(column)
         .where(eq(column.boardId, boardId));
-      console.log(colCount);
       const newColumn = await this.db
         .insert(column)
         .values({ ...createColumnDto, position: ++colCount[0].count, boardId })
