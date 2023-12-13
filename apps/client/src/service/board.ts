@@ -20,7 +20,7 @@ export type AddBoard = {
 };
 
 export const getBoards = async (token: string) => {
-  const url = `${baseUrl}/boards?`;
+  const url = `${baseUrl}/boards`;
 
   const data = await axios.get<{ data: Board[] }>(url, {
     headers: { Authorization: `Bearer ${token}` },
@@ -49,7 +49,7 @@ export const getBoardByName = async (name: string, token: string) => {
 export const createBoard = async (input: AddBoard, token: string) => {
   const url = `${baseUrl}/boards`;
 
-  const data = await axios.post(url, input, {
+  const data = await axios.post<{ data: Board }>(url, input, {
     headers: { Authorization: `Bearer ${token}` },
   });
   return data;
@@ -102,9 +102,14 @@ export const toggleBoardVisibility = async (id: number, token: string) => {
   const url = `${baseUrl}/boards/${id}/toggleVisibility`;
   console.log(token);
 
-  await axios.put(url, {
-    headers: { Authorization: `Bearer ${token}` },
-  });
+  const data = await axios.put(
+    url,
+    {},
+    {
+      headers: { Authorization: `Bearer ${token}` },
+    }
+  );
+  return data;
 };
 
 export const uploadBoardCover = async (

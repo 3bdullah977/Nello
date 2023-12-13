@@ -55,7 +55,22 @@ export const createCard = async (
 ) => {
   const url = `${baseUrl}/boards/${boardId}/columns/${columnId}/cards`;
 
-  const data = await axios.post(url, input, {
+  const data = await axios.post<CardResponse>(url, input, {
+    headers: { Authorization: `Bearer ${token}` },
+  });
+  return data;
+};
+
+export const updateCard = async (
+  input: Partial<AddCard & { columnId: number }>,
+  boardId: number,
+  columnId: number,
+  cardId: number,
+  token: string
+) => {
+  const url = `${baseUrl}/boards/${boardId}/columns/${columnId}/cards/${cardId}`;
+
+  const data = await axios.patch<CardResponse>(url, input, {
     headers: { Authorization: `Bearer ${token}` },
   });
   return data;

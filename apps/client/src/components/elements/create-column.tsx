@@ -8,6 +8,7 @@ import { useParams } from "react-router-dom";
 import { useMutation, useQuery } from "@tanstack/react-query";
 import { createColumn } from "@/service/column";
 import { DialogClose } from "@radix-ui/react-dialog";
+import { toast } from "../ui/use-toast";
 
 function CreateColumn({
   setOpen,
@@ -24,8 +25,14 @@ function CreateColumn({
 
   const { mutate } = useMutation({
     mutationKey: ["columns"],
-    mutationFn: () =>
-      createColumn({ name: columnName }, parseInt(boardId!), token),
+    mutationFn: () => {
+      if (!columnName)
+        toast({
+          title: "Invalid input",
+          description: "column name can not be empty",
+        });
+      return createColumn({ name: columnName }, parseInt(boardId!), token);
+    },
     onSuccess: (data: any) => {
       setOpen(false);
       console.log(data);
@@ -49,15 +56,11 @@ function CreateColumn({
         </CardContent>
         <CardFooter className="gap-5 justify-end">
           <DialogClose asChild>
-            <Button variant="blue" className="border p-5 rounded-xl">
+            <Button variant="secondary" className="border p-5 rounded-xl">
               Cancel
             </Button>
           </DialogClose>
-          <Button
-            variant="outline"
-            className="bg-zinc-400 p-5 text-white"
-            onClick={() => mutate()}
-          >
+          <Button variant="default" className="p-5" onClick={() => mutate()}>
             <Plus className="pr-2" />
             Create
           </Button>

@@ -18,4 +18,9 @@ export default defineConfig({
       },
     },
   },
+  define: {
+    // "process.env": {},
+    "process.env.IS_REACT": JSON.stringify("true"),
+    "process.env.IS_PREACT": JSON.stringify("true"),
+  },
 });

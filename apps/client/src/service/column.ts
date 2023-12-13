@@ -25,21 +25,42 @@ export const getColumns = async (boardId: number, token: string) => {
   return data;
 };
 
-export const getColumnById = async (id: number, boardId: number) => {
+export const getColumnById = async (
+  id: number,
+  boardId: number,
+  token: string
+) => {
   const url = `${baseUrl}/boards/${boardId}/columns/${id}`;
 
-  const data = await axios.get(url, { headers: { Authorization: authToken } });
+  const data = await axios.get<{
+    message: string;
+    data: ColumnType;
+    statusCode: number;
+  }>(url, { headers: { Authorization: `Bearer ${token}` } });
   return data;
 };
 
 export const createColumn = async (
   input: AddColumn,
   boardId: number,
-  token: string,
+  token: string
 ) => {
   const url = `${baseUrl}/boards/${boardId}/columns`;
 
   const data = await axios.post(url, input, {
+    headers: { Authorization: `Bearer ${token}` },
+  });
+  return data;
+};
+
+export const removeColumn = async (
+  columnId: number,
+  boardId: number,
+  token: string
+) => {
+  const url = `${baseUrl}/boards/${boardId}/columns/${columnId}`;
+
+  const data = await axios.delete<{ data: ColumnType }>(url, {
     headers: { Authorization: `Bearer ${token}` },
   });
   return data;

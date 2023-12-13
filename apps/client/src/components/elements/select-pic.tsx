@@ -6,21 +6,21 @@ import {
 import { Input } from "@/components/ui/input";
 // import Final from "./final";
 import { Search } from "lucide-react";
-import { useState } from "react";
+import React, { useEffect, useState } from "react";
 import axios from "axios";
+import { Skeleton } from "../ui/skeleton";
 // import React from "react";
 // import { useNavigate } from "react-router-dom";
 
-// type CreateCardProps = {
-//   pic: string;
-//   setPic: string;
-//   data: string;
-//   setData: string;
-// };
-function SelectPic({ pic, setPic, data, setData }: any) {
-  // const history = useNavigate();
-  // const final = Final();
-  const [inputValue, setInputValue] = useState(null);
+type SelectPicProps = {
+  pic: string;
+  setPic: React.Dispatch<React.SetStateAction<string>>;
+  data: string;
+  setData: React.Dispatch<React.SetStateAction<string>>;
+};
+function SelectPic({ pic, setPic, data, setData }: SelectPicProps) {
+  const [isLoading, setIsLoading] = useState(true);
+  const [inputValue, setInputValue] = useState();
 
   const click = (e: any) => {
     setPic(e.target.src);
@@ -31,7 +31,9 @@ function SelectPic({ pic, setPic, data, setData }: any) {
   };
   const sumbmitSearch = async () => {
     const dataFetch = await axios.get(
-      `https://api.pexels.com/v1/search?query=${inputValue}+query&per_page=15&page=1`,
+      inputValue
+        ? `https://api.pexels.com/v1/search?query=${inputValue}+query&per_page=15&page=1`
+        : "https://api.pexels.com/v1/search?query=all&per_page=15&page=1",
       {
         method: "GET",
         headers: {
@@ -39,10 +41,15 @@ function SelectPic({ pic, setPic, data, setData }: any) {
           Authorization:
             "563492ad6f91700001000001c84723fce83d46c993eddb350985e0bc",
         },
-      }
+      },
     );
     setData(dataFetch.data.photos);
   };
+
+  useEffect(() => {
+    setIsLoading(true);
+    sumbmitSearch().then(() => setIsLoading(false));
+  }, [inputValue]);
 
   return (
     <div className="create-card">
@@ -66,6 +73,7 @@ function SelectPic({ pic, setPic, data, setData }: any) {
             </label>
           </div>
           <div className="pics flex gap-5 h-96 overflow-y-scroll">
+            {isLoading && <Skeleton className="w-full h-96"></Skeleton>}
             <ul className="gallery">
               {data &&
                 data.map((card: any) => (

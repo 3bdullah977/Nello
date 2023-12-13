@@ -2,7 +2,6 @@
 @tailwind components;
 @tailwind utilities;
 
-
 @layer base {
   :root {
     --background: 0 0% 100%;
@@ -26,7 +25,7 @@
     --ring: 221.2 83.2% 53.3%;
     --radius: 0.75rem;
   }
- 
+
   .dark {
     --background: 222.2 84% 4.9%;
     --foreground: 210 40% 98%;
@@ -50,6 +49,54 @@
   }
 }
 
+ .editor {
+    @apply w-full;
+}
+
+.editor h2 {
+    font-size: 1.25rem !important;
+    line-height: 1.25rem !important;
+    @apply leading-5 font-semibold mb-4;
+}
+
+.editor a:not(.no-underline) {
+    @apply underline;
+}
+
+.editor a:visited {
+    color: green;
+} 
+
+.editor ul {
+    list-style-type: disc;
+    padding-left: 1rem;
+}
+
+.editor ol {
+    list-style-type: decimal;
+    padding-left: 1rem;
+}
+
+.editor pre {
+    display: inline-block;
+    width: 100%;
+    vertical-align: top;
+    font-family: monospace;
+    font-size: 1.5em;
+    padding: 0.5em;
+    white-space: pre;
+    background-color: #eee;
+    overflow-x: auto;
+}
+
+.editor blockquote {
+    border: 0 solid #ccc;
+    border-left-width: 0px;
+    border-left-width: 0.3em;
+    margin-left: 0.3em;
+    padding-left: 0.6em;
+}
+
 @layer base {
   * {
     @apply border-border;
@@ -58,4 +105,3 @@
     @apply bg-background text-foreground;
   }
 }
-

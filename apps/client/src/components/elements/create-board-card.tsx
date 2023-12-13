@@ -16,17 +16,20 @@ import {
   DialogTrigger,
 } from "@/components/ui/dialog";
 import SelectPic from "./select-pic";
-import { useState } from "react";
-import axios from "axios";
-import { useMutation } from "@tanstack/react-query";
+import React, { useState } from "react";
+import axios, { AxiosError } from "axios";
+import { useMutation, useQuery } from "@tanstack/react-query";
 import { createBoard } from "@/service/board";
 import { useLocalStorage } from "usehooks-ts";
 import { User } from "@/service/user";
-// type CreateCardProps = {
-//   columnValue: string;
-// };
+import { DialogClose } from "@radix-ui/react-dialog";
+import { toast } from "../ui/use-toast";
 
-function CreateBoardCard() {
+function CreateBoardCard({
+  setOpen,
+}: {
+  setOpen: React.Dispatch<React.SetStateAction<boolean>>;
+}) {
   const [pic, setPic] = useState("");
   const [data, setData] = useState("");
   const [isPrivate, setIsPrivate] = useState(false);
@@ -34,10 +37,14 @@ function CreateBoardCard() {
   const [token] = useLocalStorage("token", "");
   const [user] = useLocalStorage("user", {} as User);
 
+  const query = useQuery({
+    queryKey: ["boards"],
+  });
+
   const { mutate, data: mutateData } = useMutation({
     mutationKey: ["createBoard"],
-    mutationFn: () =>
-      createBoard(
+    mutationFn: async () => {
+      const data = await createBoard(
         {
           creatorId: user.id,
           imageUrl: pic,
@@ -45,7 +52,16 @@ function CreateBoardCard() {
           name: title,
         },
         token
-      ),
+      );
+      query.refetch();
+      setOpen(false);
+      return data;
+    },
+    onError: (e: any) =>
+      toast({
+        title: "Error creating board",
+        description: e.response?.data.message,
+      }),
   });
 
   const getData = async () => {
@@ -85,28 +101,30 @@ function CreateBoardCard() {
             />
           </div>
           <div className="create-cars-btn flex gap-5">
-            <Button variant="outline" className="w-full  p-5">
-              <Image className="pr-2" />
-              <Dialog>
-                <DialogTrigger onClick={getData}>Cover</DialogTrigger>
-                <DialogContent>
-                  <DialogHeader>
-                    <DialogTitle>Photo search</DialogTitle>
-                    <DialogDescription>
-                      <SelectPic
-                        pic={pic}
-                        setPic={setPic}
-                        data={data}
-                        setData={setData}
-                      />
-                    </DialogDescription>
-                  </DialogHeader>
-                </DialogContent>
-              </Dialog>
-            </Button>
+            <Dialog>
+              <DialogTrigger onClick={getData} className="w-full">
+                <Button variant="outline" className="w-full p-5">
+                  <Image className="pr-2" />
+                  Cover
+                  <DialogContent>
+                    <DialogHeader>
+                      <DialogTitle>Photo search</DialogTitle>
+                      <DialogDescription>
+                        <SelectPic
+                          pic={pic}
+                          setPic={setPic}
+                          data={data}
+                          setData={setData}
+                        />
+                      </DialogDescription>
+                    </DialogHeader>
+                  </DialogContent>
+                </Button>
+              </DialogTrigger>
+            </Dialog>
             <Button
               variant="outline"
-              className="w-full  p-5"
+              className="w-full p-5"
               onClick={() => setIsPrivate((prev) => !prev)}
             >
               {!isPrivate ? (
@@ -124,9 +142,11 @@ function CreateBoardCard() {
           </div>
         </CardContent>
         <CardFooter className="gap-5 justify-end">
-          <Button variant="blue" className="border p-5 rounded-xl">
-            Cancel
-          </Button>
+          <DialogClose asChild>
+            <Button variant="blue" className="border p-5 rounded-xl">
+              Cancel
+            </Button>
+          </DialogClose>
           <Button
             variant="outline"
             className="bg-zinc-400 p-5 text-white"
