@@ -81,7 +81,6 @@ function CreateBoardCard({
 
   const createBoardCard = async () => {
     mutate();
-    console.log(mutateData?.data);
   };
 
   return (

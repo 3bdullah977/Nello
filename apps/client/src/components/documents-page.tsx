@@ -53,12 +53,10 @@ export const Documents = () => {
     data: AddDocument
   ) => {
     e.preventDefault();
-    let res;
     try {
-      res = await createDocument(boardId!, data, token);
+      await createDocument(boardId!, data, token);
       refetch();
     } catch (error) {
-      console.log(res);
       toast({
         title: "Error creating document",
       });

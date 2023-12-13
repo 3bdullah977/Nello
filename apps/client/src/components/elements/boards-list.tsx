@@ -27,7 +27,6 @@ function BoardsList() {
   });
 
   useEffect(() => {
-    console.log(token, "jdkfj");
     if (!token) navigate("/login");
   }, [data]);
 

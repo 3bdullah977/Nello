@@ -100,7 +100,6 @@ export const removeUserFromBoard = async (
 
 export const toggleBoardVisibility = async (id: number, token: string) => {
   const url = `${baseUrl}/boards/${id}/toggleVisibility`;
-  console.log(token);
 
   const data = await axios.put(
     url,

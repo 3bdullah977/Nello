@@ -31,7 +31,6 @@ export function CreateAccount() {
   const navigate = useNavigate();
 
   useEffect(() => {
-    console.log(user);
     if (user) redirect("/boards");
   }, []);
 

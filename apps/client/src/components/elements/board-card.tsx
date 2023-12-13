@@ -21,7 +21,6 @@ function BoardCard({ card }: { card: Board }) {
   const [members, setMembers] = useState<User[]>([]);
   const dispatch: any = useDispatch();
   const id = (e: any) => {
-    console.log(e.id);
     dispatch(boardsID(e.id));
     dispatch(columns(e.id, token));
   };

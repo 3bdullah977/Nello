@@ -56,12 +56,10 @@ export const Drawings = () => {
     data: AddDrawing
   ) => {
     e.preventDefault();
-    let res;
     try {
-      res = await createDrawing(boardId!, data, token);
+      await createDrawing(boardId!, data, token);
       refetch();
     } catch (error) {
-      console.log(res);
       toast({
         title: "Error creating drawing",
       });

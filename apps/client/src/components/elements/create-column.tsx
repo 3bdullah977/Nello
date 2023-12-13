@@ -33,9 +33,8 @@ function CreateColumn({
         });
       return createColumn({ name: columnName }, parseInt(boardId!), token);
     },
-    onSuccess: (data: any) => {
+    onSuccess: () => {
       setOpen(false);
-      console.log(data);
       query.refetch();
     },
   });

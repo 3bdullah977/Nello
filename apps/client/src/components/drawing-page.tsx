@@ -14,7 +14,6 @@ const DrawingPage = () => {
 
   const { mutate, isPending } = useMutation({
     mutationFn: async () => {
-      console.log(drawing);
       setDrawing(JSON.parse(drawingData));
       const res = await updateDrawing(
         parseInt(drawingId!),

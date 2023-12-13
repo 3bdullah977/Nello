@@ -34,7 +34,6 @@ export function Login() {
   const navigate = useNavigate();
 
   useEffect(() => {
-    console.log(user);
     if (user) redirect("/boards");
   }, []);
 

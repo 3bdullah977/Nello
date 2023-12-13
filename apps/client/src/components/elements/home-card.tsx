@@ -17,7 +17,7 @@ import { Skeleton } from "../ui/skeleton";
 import Editor from "../editor";
 import { Dispatch, SetStateAction, useState } from "react";
 import { Button } from "../ui/button";
-import { Loader } from "lucide-react";
+import { Loader, MessageCircle } from "lucide-react";
 import {
   Select,
   SelectItem,
@@ -26,6 +26,8 @@ import {
   SelectContent,
   SelectGroup,
 } from "../ui/select";
+import { Dialog, DialogTrigger } from "../ui/dialog";
+import Comments from "../comments";
 
 function CardComponent({
   card,
@@ -168,15 +170,25 @@ function CardPage({
         <Editor onChange={setDescription} content={card.description} />
         <div className="w-full flex justify-between mt-2">
           <div></div>
-          <Button
-            className="w-full sm:w-[100px]"
-            onClick={() => {
-              mutation.mutate();
-              updateColMutation.mutate(newColId);
-            }}
-          >
-            {mutation.isPending ? <Loader /> : <p>Save</p>}
-          </Button>
+          <div className="flex items-center gap-4">
+            <Dialog>
+              <DialogTrigger>
+                <Button size={"icon"} variant={"secondary"}>
+                  <MessageCircle size={20} />
+                </Button>
+              </DialogTrigger>
+              <Comments cardId={card.id} />
+            </Dialog>
+            <Button
+              className="w-full sm:w-[100px]"
+              onClick={() => {
+                mutation.mutate();
+                updateColMutation.mutate(newColId);
+              }}
+            >
+              {mutation.isPending ? <Loader /> : <p>Save</p>}
+            </Button>
+          </div>
         </div>
       </ScrollArea>
     </SheetContent>

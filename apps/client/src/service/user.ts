@@ -20,7 +20,6 @@ export type AddUser = {
 
 export const getUsers = async (page: number = 1, limit: number = 10) => {
   const url = `${baseUrl}/users?page=${page}&limit=${limit}`;
-  console.log(url);
 
   const data = await axios.get(url, { headers: { Authorization: authToken } });
   return data;
@@ -28,18 +27,15 @@ export const getUsers = async (page: number = 1, limit: number = 10) => {
 
 export const getUserById = async (id: number, token: string) => {
   const url = `${baseUrl}/users/${id}`;
-  console.log(url);
 
   const data = await axios.get<{ data: User }>(url, {
     headers: { Authorization: `Bearer ${token}` },
   });
-  console.log(data);
   return data;
 };
 
 export const findUsersByName = async (name: string, token: string) => {
   const url = `${baseUrl}/users/${name}/findByName`;
-  console.log(url);
 
   const data = await axios.get<{ data: User[] }>(url, {
     headers: { Authorization: `Bearer ${token}` },
@@ -49,7 +45,6 @@ export const findUsersByName = async (name: string, token: string) => {
 
 export const createUser = async (input: AddUser, token: string) => {
   const url = `${baseUrl}/users`;
-  console.log(url);
 
   const data = await axios.post<{
     statusCode: number;
@@ -67,7 +62,6 @@ export const addUserToBoard = async (
   token: string
 ) => {
   const url = `${baseUrl}/boards/${boardId}/addUserToBoard`;
-  console.log(url);
 
   const data = await axios.put(
     url,

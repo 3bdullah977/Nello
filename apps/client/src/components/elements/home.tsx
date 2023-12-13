@@ -106,12 +106,9 @@ function Board() {
     queryFn: async () => listBoardMembers(parseInt(boardId!), token),
   });
 
-  const onDragEnd = (e: DragEndEvent) => {
-    console.log("event", e);
-  };
+  const onDragEnd = () => {};
 
   if (isLoading || isLoading2 || !boardData) return <>loading..</>;
-  console.log(boardData.data.data);
   return (
     <>
       <div className="p-5 pb-0 flex justify-between">
@@ -172,6 +169,9 @@ function Board() {
             <DropdownMenuGroup>
               <DropdownMenuItem>
                 <Link to={`/boards/${boardId}/documents`}>Documents</Link>
+              </DropdownMenuItem>
+              <DropdownMenuItem>
+                <Link to={`/boards/${boardId}/drawings`}>Drawings</Link>
               </DropdownMenuItem>
             </DropdownMenuGroup>
           </DropdownMenuContent>
@@ -323,10 +323,7 @@ const UserSearchCard = ({ user }: { user: User }) => {
   const { mutate } = useMutation({
     mutationKey: ["addUserBoard"],
     mutationFn: () => addUserToBoard(parseInt(boardId!), user.id, token),
-    onSuccess: (data) => {
-      query.refetch();
-      console.log(data);
-    },
+    onSuccess: () => query.refetch(),
   });
 
   return (
