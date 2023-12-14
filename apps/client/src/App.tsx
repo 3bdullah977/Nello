@@ -14,6 +14,8 @@ import { CreateAccount } from "./components/register-auth";
 import { Drawings } from "./components/drawings";
 import { Suspense, lazy } from "react";
 import { Skeleton } from "./components/ui/skeleton";
+import Profile from "./components/profile";
+import EditProfile from "./components/editProfile";
 const DrawingPage = lazy(() => import("./components/drawing-page"));
 
 const queryClient = new QueryClient();
@@ -43,6 +45,9 @@ function App() {
                   path="/boards/:boardId/drawings"
                   element={<Drawings />}
                 />
+                <Route path="/profile" element={<Profile />} />
+                <Route path="/editProfile" element={<EditProfile />} />
+
                 <Route
                   path="/boards/:boardId/drawings/:drawingId"
                   element={
